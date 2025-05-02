@@ -123,7 +123,10 @@ public class ChessPiece {
         //straight moves logic
         if(board.getPiece(positionToCheck) == null){
             if(checkPawnPromotion(positionToCheck)) {
-                moves.add(new ChessMove(pos, positionToCheck, null));//figure out how to do promotion
+                moves.add(new ChessMove(pos, positionToCheck, PieceType.QUEEN));//figure out how to do promotion
+                moves.add(new ChessMove(pos, positionToCheck, PieceType.ROOK));
+                moves.add(new ChessMove(pos, positionToCheck, PieceType.KNIGHT));
+                moves.add(new ChessMove(pos, positionToCheck, PieceType.BISHOP));
             }else {
                 moves.add(new ChessMove(pos, positionToCheck, null));
             }
@@ -140,7 +143,12 @@ public class ChessPiece {
             if (board.getPiece(positionToCheck) != null) {
                 if (board.getPiece(positionToCheck).pieceColor != this.pieceColor) {
                     if (checkPawnPromotion(positionToCheck)) {
-                        moves.add(new ChessMove(pos, positionToCheck, null));//figure out how to do promotion
+                        for(int i = 1; i <4; i++) {
+                            moves.add(new ChessMove(pos, positionToCheck, PieceType.QUEEN));//figure out how to do promotion
+                            moves.add(new ChessMove(pos, positionToCheck, PieceType.ROOK));
+                            moves.add(new ChessMove(pos, positionToCheck, PieceType.KNIGHT));
+                            moves.add(new ChessMove(pos, positionToCheck, PieceType.BISHOP));
+                        }
                     } else {
                         moves.add(new ChessMove(pos, positionToCheck, null));
                     }
@@ -153,7 +161,10 @@ public class ChessPiece {
             if (board.getPiece(positionToCheck) != null) {
                 if (board.getPiece(positionToCheck).pieceColor != this.pieceColor) {
                     if (checkPawnPromotion(positionToCheck)) {
-                        moves.add(new ChessMove(pos, positionToCheck, null));//figure out how to do promotion
+                        moves.add(new ChessMove(pos, positionToCheck, PieceType.QUEEN));//figure out how to do promotion
+                        moves.add(new ChessMove(pos, positionToCheck, PieceType.ROOK));
+                        moves.add(new ChessMove(pos, positionToCheck, PieceType.KNIGHT));
+                        moves.add(new ChessMove(pos, positionToCheck, PieceType.BISHOP));
                     } else {
                         moves.add(new ChessMove(pos, positionToCheck, null));
                     }
