@@ -244,10 +244,9 @@ public class ChessPiece {
     }
 
     private Collection<ChessMove>getQueenMoves(ChessBoard board, ChessPosition pos){
-        System.out.println("get queen moves");
         ArrayList<ChessMove> moves = new ArrayList<>();
-//        moves.addAll(getBishopMoves(board, pos));
-//        moves.addAll(getRookMoves(board, pos));
+        moves.addAll(getBishopMoves(board, pos));
+        moves.addAll(getRookMoves(board, pos));
 
 
         return moves;
