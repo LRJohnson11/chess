@@ -246,14 +246,39 @@ public class ChessPiece {
     private Collection<ChessMove>getQueenMoves(ChessBoard board, ChessPosition pos){
         System.out.println("get queen moves");
         ArrayList<ChessMove> moves = new ArrayList<>();
+//        moves.addAll(getBishopMoves(board, pos));
+//        moves.addAll(getRookMoves(board, pos));
 
 
         return moves;
     }
 
     private Collection<ChessMove>getBishopMoves(ChessBoard board, ChessPosition pos){
-        System.out.println("get bishop moves");
         ArrayList<ChessMove> moves = new ArrayList<>();
+        int[] dx = {1,-1};
+        int[] dy = {1,-1};
+        for(int x: dx){
+            for( int y: dy){
+                int dist = 1;
+                while(true){
+                    ChessPosition positionToCheck = new ChessPosition(pos.getRow() + y*dist, pos.getColumn()+x*dist);
+
+                    if (!checkValidPosition(positionToCheck)) {
+                        break;
+                    }
+                    if (board.getPiece(positionToCheck) == null) {
+                        moves.add(new ChessMove(pos, positionToCheck, null));
+                    } else if (board.getPiece(positionToCheck).pieceColor != this.pieceColor) {
+                        moves.add(new ChessMove(pos, positionToCheck, null));
+                        break;
+                    } else {
+                        break;
+                    }
+                    dist +=1;
+                }
+
+            }
+        }
 
 
         return moves;
