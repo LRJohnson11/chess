@@ -85,8 +85,12 @@ public class ChessPiece {
             case KNIGHT -> getKnightMoves(board, myPosition);
         };
     }
+        //helper function
+    private boolean checkValidPosition(ChessPosition pos){
+        return pos.getColumn() >= 1 && pos.getColumn() <= 8 && pos.getRow() >=1 && pos.getRow() <= 8;
+    }
 
-
+        // pawn functions
     private boolean checkPawnInitialMove(ChessPosition pos){
         if(this.type != PieceType.PAWN){
             return false;
@@ -106,9 +110,7 @@ public class ChessPiece {
         }
         return false;
     }
-    private boolean checkValidPosition(ChessPosition pos){
-        return pos.getColumn() >= 1 && pos.getColumn() <= 8 && pos.getRow() >=1 && pos.getRow() <= 8;
-    }
+
 
     private Collection<ChessMove>getPawnMoves(ChessBoard board, ChessPosition pos){
         ArrayList<ChessMove> moves = new ArrayList<>();
@@ -161,12 +163,25 @@ public class ChessPiece {
 
         return moves;
     }
-
+        //king moves
     private Collection<ChessMove>getKingMoves(ChessBoard board, ChessPosition pos){
-        System.out.println("get king moves");
+
         ArrayList<ChessMove> moves = new ArrayList<>();
-
-
+        int[] dx = {1,0,-1};
+        int[] dy = {1,0,-1};
+        for(int x : dx){
+            for(int y : dy){
+                ChessPosition positionToCheck = new ChessPosition(pos.getRow()+y, pos.getColumn()+x);
+                if(checkValidPosition(positionToCheck)){
+                    if(board.getPiece(positionToCheck) == null){
+                        moves.add(new ChessMove(pos, positionToCheck, null));
+                    }
+                    else if(board.getPiece(positionToCheck).pieceColor != this.pieceColor){
+                        moves.add(new ChessMove(pos,positionToCheck,null));
+                    }
+                }
+            }
+        }
         return moves;
     }
 
