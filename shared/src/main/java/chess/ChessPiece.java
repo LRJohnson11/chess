@@ -284,7 +284,6 @@ public class ChessPiece {
     }
 
     private Collection<ChessMove>getKnightMoves(ChessBoard board, ChessPosition pos){
-        System.out.println("get knight moves");
         ArrayList<ChessMove> moves = new ArrayList<>();
         int[] dx = {1,2, 2, 1,-1,-2,-2,-1};
         int[] dy = {2,1,-1,-2,-2,-1, 1, 2};
