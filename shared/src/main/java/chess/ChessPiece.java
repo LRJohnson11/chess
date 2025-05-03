@@ -286,6 +286,7 @@ public class ChessPiece {
     private Collection<ChessMove>getKnightMoves(ChessBoard board, ChessPosition pos){
         System.out.println("get knight moves");
         ArrayList<ChessMove> moves = new ArrayList<>();
+        //still need to implement knight moves
 
 
         return moves;
