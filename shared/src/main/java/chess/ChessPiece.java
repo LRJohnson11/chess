@@ -286,8 +286,19 @@ public class ChessPiece {
     private Collection<ChessMove>getKnightMoves(ChessBoard board, ChessPosition pos){
         System.out.println("get knight moves");
         ArrayList<ChessMove> moves = new ArrayList<>();
-        //still need to implement knight moves
-
+        int[] dx = {1,2, 2, 1,-1,-2,-2,-1};
+        int[] dy = {2,1,-1,-2,-2,-1, 1, 2};
+        for(int i = 0; i < 8; i++){
+            ChessPosition positionToCheck = new ChessPosition(pos.getRow() + dy[i], pos.getColumn() + dx[i]);
+            if(checkValidPosition(positionToCheck)){
+                if(board.getPiece(positionToCheck) == null){
+                    moves.add(new ChessMove(pos, positionToCheck, null));
+                }
+                else if(board.getPiece(positionToCheck).pieceColor != this.pieceColor){
+                    moves.add(new ChessMove(pos, positionToCheck, null));
+                }
+            }
+        }
 
         return moves;
     }
