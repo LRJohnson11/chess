@@ -10,9 +10,9 @@ import java.util.Objects;
  * signature of the existing methods.
  */
 public class ChessBoard {
-    private final ChessPiece[][] board = new ChessPiece[8][8];
+    ChessPiece[][] board = new ChessPiece[8][8];
     public ChessBoard() {
-        ChessPiece[][] board = new ChessPiece[8][8];
+
     }
 
     @Override
@@ -38,7 +38,6 @@ public class ChessBoard {
     public void addPiece(ChessPosition position, ChessPiece piece) {
         board[position.getRow()-1][position.getColumn()-1] = piece;
     }
-
     /**
      * Gets a chess piece on the chessboard
      *
@@ -47,7 +46,7 @@ public class ChessBoard {
      * position
      */
     public ChessPiece getPiece(ChessPosition position) {
-        return board[position.getRow() - 1][position.getColumn()-1];
+        return board[position.getRow()-1][position.getColumn()-1];
     }
 
     /**
@@ -55,41 +54,47 @@ public class ChessBoard {
      * (How the game of chess normally starts)
      */
     public void resetBoard() {
-        for(int i = 1; i < 9; i++){
-            for(int j = 1; j < 9; j++){
-                ChessPosition pos = new ChessPosition(i,j);
-                if(i > 2 && i < 7){
-                    this.addPiece(pos, null);
+        for(int y = 0; y < 8; y++){
+            for(int x = 0; x < 8; x++){
+                if(y > 1 && y < 6 ){
+                    board[y][x] = null;
                 }
-                else if(i ==2){
-                    this.addPiece(pos, new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN));
+                else if(y ==1){
+                    board[y][x] = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN);
                 }
-                else if(i == 7){
-                    this.addPiece(pos, new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN));
+                else if(y == 6){
+                    board[y][x] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN);
                 }
-                else if(i == 1){
-                    if(j == 1|| j ==8){
-                        this.addPiece(pos, new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.ROOK));
-                    }else if(j==2 || j==7){
-                        this.addPiece(pos, new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.KNIGHT));
-                    }else if(j==3 || j==6) {
-                        this.addPiece(pos, new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.BISHOP));
-                    }else if(j==4){
-                        this.addPiece(pos, new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.QUEEN));
-                    }else{
-                        this.addPiece(pos, new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.KING));
+                else if(y == 0){
+                    if(x == 0 || x == 7){
+                        board[y][x] = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.ROOK);
                     }
-                }else{
-                    if(j == 1|| j ==8){
-                        this.addPiece(pos, new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.ROOK));
-                    }else if(j==2 || j==7){
-                        this.addPiece(pos, new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.KNIGHT));
-                    }else if(j==3 || j==6) {
-                        this.addPiece(pos, new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.BISHOP));
-                    }else if(j==4){
-                        this.addPiece(pos, new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.QUEEN));
-                    }else{
-                        this.addPiece(pos, new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.KING));
+                    else if(x == 1 || x == 6){
+                        board[y][x] = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.KNIGHT);
+                    }
+                    else if(x == 2 || x == 5){
+                        board[y][x] = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.BISHOP);
+                    }
+                    else if(x == 3){
+                        board[y][x] = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.QUEEN);
+                    } else {
+                        board[y][x] = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.KING);
+                    }
+                }
+                else {
+                    if(x == 0 || x == 7){
+                        board[y][x] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.ROOK);
+                    }
+                    else if(x == 1 || x == 6){
+                        board[y][x] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.KNIGHT);
+                    }
+                    else if(x == 2 || x == 5){
+                        board[y][x] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.BISHOP);
+                    }
+                    else if(x == 3){
+                        board[y][x] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.QUEEN);
+                    } else {
+                        board[y][x] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.KING);
                     }
                 }
 

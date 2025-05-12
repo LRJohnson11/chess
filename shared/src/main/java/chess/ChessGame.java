@@ -1,5 +1,6 @@
 package chess;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 /**
@@ -9,16 +10,16 @@ import java.util.Collection;
  * signature of the existing methods.
  */
 public class ChessGame {
-
+private ChessGame.TeamColor teamTurn = TeamColor.WHITE;
+private ChessBoard gameBoard;
     public ChessGame() {
-
     }
 
     /**
      * @return Which team's turn it is
      */
     public TeamColor getTeamTurn() {
-        throw new RuntimeException("Not implemented");
+        return teamTurn;
     }
 
     /**
@@ -27,7 +28,7 @@ public class ChessGame {
      * @param team the team whose turn it is
      */
     public void setTeamTurn(TeamColor team) {
-        throw new RuntimeException("Not implemented");
+        teamTurn = team;
     }
 
     /**
@@ -46,7 +47,18 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
-        throw new RuntimeException("Not implemented");
+        if(this.gameBoard.getPiece(startPosition) == null){
+            return null;
+        }
+        ArrayList<ChessMove> moves = new ArrayList<>(this.gameBoard.getPiece(startPosition).pieceMoves(getBoard(), startPosition));
+        if(isInCheck(teamTurn)) {
+            for (ChessMove move : moves) {
+                if (moveInvalid(move)) {
+                    moves.remove(move);
+                }
+            }
+        }
+        return moves;
     }
 
     /**
@@ -66,6 +78,11 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
+        //check if King is being attacked
+
+        //find position of this team's king
+        //check all legal moves of enemy team
+        //if king is in a position of any legal moves of enemy team, king is in check
         throw new RuntimeException("Not implemented");
     }
 
@@ -76,6 +93,11 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
+        //check if there are any valid moves for team and player is in check
+        //find position of this team's king. determine all moves he can make in his position.
+        //find all legal moves this team can make.
+        //check all legal moves of enemy team.
+        //if
         throw new RuntimeException("Not implemented");
     }
 
@@ -87,6 +109,10 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
+        //check if not in check  and no valid moves
+        //collect all valid moves for this team, also grab king position.
+        //collect all enemy moves and check king valid moves.
+        //if king's position is safe, but no valid moves available for team, return true.
         throw new RuntimeException("Not implemented");
     }
 
@@ -96,7 +122,7 @@ public class ChessGame {
      * @param board the new board to use
      */
     public void setBoard(ChessBoard board) {
-        throw new RuntimeException("Not implemented");
+        this.gameBoard = board;
     }
 
     /**
@@ -105,6 +131,10 @@ public class ChessGame {
      * @return the chessboard
      */
     public ChessBoard getBoard() {
-        throw new RuntimeException("Not implemented");
+        return this.gameBoard;
+    }
+
+    private boolean moveInvalid(ChessMove move){
+        return false;
     }
 }
