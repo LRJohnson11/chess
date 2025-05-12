@@ -13,6 +13,8 @@ public class ChessGame {
 private ChessGame.TeamColor teamTurn = TeamColor.WHITE;
 private ChessBoard gameBoard;
     public ChessGame() {
+        this.gameBoard = new ChessBoard();
+        gameBoard.resetBoard();
     }
 
     /**
@@ -51,7 +53,7 @@ private ChessBoard gameBoard;
             return null;
         }
         ArrayList<ChessMove> moves = new ArrayList<>(this.gameBoard.getPiece(startPosition).pieceMoves(getBoard(), startPosition));
-        if(isInCheck(teamTurn)) {
+        if(isInCheck(teamTurn)) {//if I'm in check, my moves are different, so then go through move validation. Otherwise, any piece's valid move is legal
             for (ChessMove move : moves) {
                 if (moveInvalid(move)) {
                     moves.remove(move);
