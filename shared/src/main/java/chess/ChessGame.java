@@ -92,7 +92,10 @@ private ChessBoard gameBoard;
             else throw new InvalidMoveException("wrong turn");
         }
         if(legalMoves.contains(move)){
-            this.gameBoard.addPiece(move.getEndPosition(), this.gameBoard.getPiece(move.getStartPosition()));
+            if(move.getPromotionPiece() != null){
+                this.gameBoard.addPiece(move.getEndPosition(), new ChessPiece(teamTurn, move.getPromotionPiece()));
+            }
+            else this.gameBoard.addPiece(move.getEndPosition(), this.gameBoard.getPiece(move.getStartPosition()));
             this.gameBoard.addPiece(move.getStartPosition(), null);
             if(this.teamTurn == TeamColor.WHITE) teamTurn = TeamColor.BLACK;
             else teamTurn = TeamColor.WHITE;
