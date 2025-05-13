@@ -10,9 +10,9 @@ import java.util.Objects;
  * signature of the existing methods.
  */
 public class ChessBoard {
-    ChessPiece[][] board = new ChessPiece[8][8];
+    ChessPiece[][] board;
     public ChessBoard() {
-
+        board = new ChessPiece[8][8];
     }
 
     @Override
@@ -100,5 +100,13 @@ public class ChessBoard {
 
             }
         }
+    }
+
+    public ChessBoard copy() {
+        ChessBoard newBoard = new ChessBoard();
+        for (int i = 0; i < 8; i++) {
+            System.arraycopy(board[i], 0, newBoard.board[i], 0, 8);
+        }
+        return newBoard;
     }
 }

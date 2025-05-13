@@ -69,7 +69,7 @@ private ChessBoard gameBoard;
         }
         ArrayList<ChessMove> moves = new ArrayList<>(this.gameBoard.getPiece(startPosition).pieceMoves(getBoard(), startPosition));
 
-        moves.removeIf(move -> moveInvalid(move, this.getBoard(), this.teamTurn));
+        moves.removeIf(move -> moveInvalid(move, this.teamTurn));//consider removing teamturn from this funciton too
 
         return moves;
     }
@@ -81,7 +81,7 @@ private ChessBoard gameBoard;
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        if(!moveInvalid(move, this.getBoard(), this.teamTurn)){
+        if(!moveInvalid(move, this.teamTurn)){
             this.gameBoard.addPiece(move.getEndPosition(), this.gameBoard.getPiece(move.getStartPosition()));
             this.gameBoard.addPiece(move.getStartPosition(), null);
         }
@@ -207,8 +207,10 @@ private ChessBoard gameBoard;
         return this.gameBoard;
     }
 
-    private boolean moveInvalid(ChessMove move, ChessBoard board, TeamColor color){
+    private boolean moveInvalid(ChessMove move, TeamColor color){
         ChessPosition kingPos = findKingForColor(color);
+        //create copy of the board
+        ChessBoard board = this.gameBoard.copy();
         ChessPiece piece = board.getPiece(move.getStartPosition());
         board.addPiece(move.getEndPosition(), piece);
         board.addPiece(move.getStartPosition(), null);
