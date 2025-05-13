@@ -109,4 +109,18 @@ public class ChessBoard {
         }
         return newBoard;
     }
+
+    public ChessPosition findKingForColor(ChessGame.TeamColor color){
+        for(int i = 1; i < 9; i++){
+            for( int j = 1;j < 9; j++){
+                ChessPosition pos = new ChessPosition(i,j);
+                if(this.getPiece(pos) != null){
+                    if(this.getPiece(pos).getTeamColor() == color && this.getPiece(pos).getPieceType() == ChessPiece.PieceType.KING){
+                        return pos;
+                    }
+                }
+            }
+        }
+        return null;
+    }
 }

@@ -11,11 +11,13 @@ import java.util.Objects;
  * signature of the existing methods.
  */
 public class ChessGame {
-private TeamColor teamTurn = TeamColor.WHITE;
+private TeamColor teamTurn;
 private ChessBoard gameBoard;
+
     public ChessGame() {
         this.gameBoard = new ChessBoard();
         gameBoard.resetBoard();
+        this.teamTurn = TeamColor.WHITE;
     }
 
     @Override
@@ -67,9 +69,10 @@ private ChessBoard gameBoard;
         if(this.gameBoard.getPiece(startPosition) == null){
             return null;
         }
+        TeamColor pieceColor = this.gameBoard.getPiece(startPosition).getTeamColor();
         ArrayList<ChessMove> moves = new ArrayList<>(this.gameBoard.getPiece(startPosition).pieceMoves(getBoard(), startPosition));
 
-        moves.removeIf(move -> moveInvalid(move, this.teamTurn));//consider removing teamturn from this funciton too
+        moves.removeIf(move -> moveInvalid(move, pieceColor));//consider removing teamturn from this funciton too
 
         return moves;
     }
@@ -100,7 +103,7 @@ private ChessBoard gameBoard;
         //check all legal moves of enemy team
         //if king is in a position of any legal moves of enemy team, king is in check
         ChessBoard board = this.getBoard();
-        ChessPosition kingPos = findKingForColor(teamColor);
+        ChessPosition kingPos = this.gameBoard.findKingForColor(teamColor);
         ChessPosition positionToCheck;
         ArrayList<ChessMove> enemyMoves = new ArrayList<>();
         for(int i = 1; i < 9; i++){
@@ -208,7 +211,7 @@ private ChessBoard gameBoard;
     }
 
     private boolean moveInvalid(ChessMove move, TeamColor color){
-        ChessPosition kingPos = findKingForColor(color);
+
         //create copy of the board
         ChessBoard board = this.gameBoard.copy();
         ChessPiece piece = board.getPiece(move.getStartPosition());
@@ -220,12 +223,13 @@ private ChessBoard gameBoard;
             for(int j = 1; j<9; j++){
                 positionToCheck = new ChessPosition(i,j);
                 if(board.getPiece(positionToCheck) != null){
-                    if(board.getPiece(positionToCheck).getTeamColor() != board.getPiece(kingPos).getTeamColor()){
+                    if(board.getPiece(positionToCheck).getTeamColor() != color){
                         enemyMoves.addAll(board.getPiece(positionToCheck).pieceMoves(board, positionToCheck));
                     }
                 }
             }
         }
+        ChessPosition kingPos = board.findKingForColor(color);
         //if any move endangers the king, move is invalid
         for(ChessMove enemyMove : enemyMoves){
            if(enemyMove.getEndPosition().equals(kingPos)){
@@ -236,25 +240,11 @@ private ChessBoard gameBoard;
     }
 
     private boolean hasValidMoves(TeamColor color){
-        ChessPosition kingPos = findKingForColor(color);
+        ChessPosition kingPos = this.gameBoard.findKingForColor(color);
         //find king
         //get all moves for this team
         //get all moves for enemy
         //for each move this
         return true;
-    }
-
-    private ChessPosition findKingForColor(TeamColor color){
-        for(int i = 1; i < 9; i++){
-            for( int j = 1;j < 9; j++){
-                ChessPosition pos = new ChessPosition(i,j);
-                if(gameBoard.getPiece(pos) != null){
-                    if(gameBoard.getPiece(pos).getTeamColor() == color && gameBoard.getPiece(pos).getPieceType() == ChessPiece.PieceType.KING){
-                        return pos;
-                    }
-                }
-            }
-        }
-        return null;
     }
 }
