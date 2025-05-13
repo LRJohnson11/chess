@@ -84,9 +84,20 @@ private ChessBoard gameBoard;
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        if(!moveInvalid(move, this.teamTurn)){
+        ArrayList<ChessMove> legalMoves = new ArrayList<>();
+        if(gameBoard.getPiece(move.getStartPosition()) != null){
+            if(gameBoard.getPiece(move.getStartPosition()).getTeamColor() == teamTurn) {
+                legalMoves.addAll(validMoves(move.getStartPosition()));
+            }
+            else throw new InvalidMoveException("wrong turn");
+        }
+        if(legalMoves.contains(move)){
             this.gameBoard.addPiece(move.getEndPosition(), this.gameBoard.getPiece(move.getStartPosition()));
             this.gameBoard.addPiece(move.getStartPosition(), null);
+            if(this.teamTurn == TeamColor.WHITE) teamTurn = TeamColor.BLACK;
+            else teamTurn = TeamColor.WHITE;
+        }else {
+            throw new InvalidMoveException("invalid move");
         }
     }
 
