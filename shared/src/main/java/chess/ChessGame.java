@@ -111,11 +111,6 @@ private ChessBoard gameBoard;
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-        //check if King is being attacked
-
-        //find position of this team's king
-        //check all legal moves of enemy team
-        //if king is in a position of any legal moves of enemy team, king is in check
         ChessBoard board = this.getBoard();
         ChessPosition kingPos = this.gameBoard.findKingForColor(teamColor);
         ChessPosition positionToCheck;
@@ -176,7 +171,9 @@ private ChessBoard gameBoard;
     public ChessBoard getBoard() {
         return this.gameBoard;
     }
-
+        /// method to check if a move violates the rules of Chess
+        /// @param move a chessmove object that needs to be validated ( we don't care about their feelings)
+        /// @param color can be deprecated and removed
     private boolean moveInvalid(ChessMove move, TeamColor color){
 
         //create copy of the board
@@ -197,6 +194,7 @@ private ChessBoard gameBoard;
             }
         }
         ChessPosition kingPos = board.findKingForColor(color);
+
         //if any move endangers the king, move is invalid
         for(ChessMove enemyMove : enemyMoves){
            if(enemyMove.getEndPosition().equals(kingPos)){
@@ -205,10 +203,11 @@ private ChessBoard gameBoard;
         }
         return false;
     }
-
+        /// no valid moves returns true if there are no valid moves found for the given team
+        /// @param color team for which this condition is checked
     private boolean noValidMoves(TeamColor color){
-        ChessPosition kingPos = this.gameBoard.findKingForColor(color);
         ArrayList<ChessMove> moves = new ArrayList<>();
+
         for(int i = 1; i < 9; i++){
             for( int j = 1; j < 9; j++){
                 ChessPosition positionToCheck = new ChessPosition(i,j);
@@ -219,10 +218,7 @@ private ChessBoard gameBoard;
                 }
             }
         }
-        //find king
-        //get all moves for this team
-        //get all moves for enemy
-        //for each move this
+
         return moves.isEmpty();
     }
 }
