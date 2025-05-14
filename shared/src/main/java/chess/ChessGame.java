@@ -124,14 +124,14 @@ private ChessBoard gameBoard;
             for(int j = 1; j<9; j++){
                 positionToCheck = new ChessPosition(i,j);
                 if(board.getPiece(positionToCheck) != null){
-                    if(board.getPiece(positionToCheck).getTeamColor() != board.getPiece(kingPos).getTeamColor()){
-                        enemyMoves.addAll(board.getPiece(positionToCheck).pieceMoves(board, positionToCheck));
+                    if(board.getPiece(positionToCheck).getTeamColor() != teamColor){
+                        enemyMoves.addAll(validMoves(positionToCheck));
                     }
                 }
             }
         }
         for(ChessMove enemyMove : enemyMoves){
-            if(enemyMove.getEndPosition() == kingPos){
+            if(enemyMove.getEndPosition().equals(kingPos)){
                 return true;
             }
         }
@@ -145,30 +145,7 @@ private ChessBoard gameBoard;
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-        return isInCheck(teamColor) && !hasValidMoves(teamColor);
-        //collect all valid moves for this team, also grab king position.
-        //collect all enemy moves and check king valid moves.
-        //if king's position is safe, but no valid moves available for team, return true.
-//        ArrayList<ChessMove> teamMoves = new ArrayList<>();
-//        ChessPosition kingPosition = null;
-//        ChessPosition positionToCheck;
-//        for(int i = 1; i < 9; i++){
-//            for( int j = 1; j < 9; j++){
-//                positionToCheck = new ChessPosition(i,j);
-//                if(gameBoard.getPiece(positionToCheck) != null){
-//                    if(gameBoard.getPiece(positionToCheck).getTeamColor() == teamColor){
-//                        teamMoves.addAll(gameBoard.getPiece(positionToCheck).pieceMoves(this.getBoard(),positionToCheck));
-//                        if(gameBoard.getPiece(positionToCheck).getPieceType() == ChessPiece.PieceType.KING){
-//                            kingPosition = new ChessPosition(i,j);
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//        ChessPosition finalKingPosition = kingPosition;
-//        teamMoves.removeIf(teamMove -> moveInvalid(teamMove, this.getBoard(), finalKingPosition));
-//        return teamMoves.isEmpty();
-//        throw new RuntimeException("Not implemented");
+        return isInCheck(teamColor) && noValidMoves(teamColor);
     }
 
     /**
@@ -179,31 +156,7 @@ private ChessBoard gameBoard;
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        return !isInCheck(teamColor) && !hasValidMoves(teamColor);
-        //check if not in check  and no valid moves
-        //collect all valid moves for this team, also grab king position.
-        //collect all enemy moves and check king valid moves.
-        //if king's position is safe, but no valid moves available for team, return true.
-//        ArrayList<ChessMove> teamMoves = new ArrayList<>();
-//        ChessPosition kingPosition = null;
-//        ChessPosition positionToCheck;
-//        for(int i = 1; i < 9; i++){
-//            for( int j = 1; j < 9; j++){
-//                positionToCheck = new ChessPosition(i,j);
-//                if(gameBoard.getPiece(positionToCheck) != null){
-//                    if(gameBoard.getPiece(positionToCheck).getTeamColor() == teamColor){
-//                        teamMoves.addAll(gameBoard.getPiece(positionToCheck).pieceMoves(this.getBoard(),positionToCheck));
-//                        if(gameBoard.getPiece(positionToCheck).getPieceType() == ChessPiece.PieceType.KING){
-//                            kingPosition = new ChessPosition(i,j);
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//        ChessPosition finalKingPosition = kingPosition;
-//        teamMoves.removeIf(teamMove -> moveInvalid(teamMove, this.getBoard(), this.teamTurn));
-//        return teamMoves.isEmpty();
-        //for each team move, if it would put the king in danger, remove it.
+        return !isInCheck(teamColor) && noValidMoves(teamColor);
     }
 
     /**
@@ -253,12 +206,23 @@ private ChessBoard gameBoard;
         return false;
     }
 
-    private boolean hasValidMoves(TeamColor color){
+    private boolean noValidMoves(TeamColor color){
         ChessPosition kingPos = this.gameBoard.findKingForColor(color);
+        ArrayList<ChessMove> moves = new ArrayList<>();
+        for(int i = 1; i < 9; i++){
+            for( int j = 1; j < 9; j++){
+                ChessPosition positionToCheck = new ChessPosition(i,j);
+                if(gameBoard.getPiece(positionToCheck)!= null){
+                    if(gameBoard.getPiece(positionToCheck).getTeamColor() == color){
+                        moves.addAll(validMoves(positionToCheck));
+                    }
+                }
+            }
+        }
         //find king
         //get all moves for this team
         //get all moves for enemy
         //for each move this
-        return true;
+        return moves.isEmpty();
     }
 }
