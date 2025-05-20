@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import spark.*;
 
 public class Server {
+    private final userService
 
     public int run(int desiredPort) {
         Spark.port(desiredPort);
@@ -13,6 +14,7 @@ public class Server {
         // Register your endpoints and handle exceptions here.
         Spark.post("/user", (req, res) -> {
             var message = req.body();
+
 
             System.out.println(message);
             res.type("application/json");
