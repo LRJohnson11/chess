@@ -1,10 +1,18 @@
 package server;
 
 import com.google.gson.Gson;
+import dataaccess.AuthDAO;
+import dataaccess.LocalAuthDAO;
+import dataaccess.LocalUserDAO;
 import spark.*;
 
 public class Server {
-    private final userService
+    private Gson gson = new Gson();
+    private AuthDAO LocalAuthDAO;
+    private UserService userService = new UserService(LocalAuthDAO, LocalUserDAO);
+
+    public Server(UserService userService) {
+    }
 
     public int run(int desiredPort) {
         Spark.port(desiredPort);
@@ -14,6 +22,8 @@ public class Server {
         // Register your endpoints and handle exceptions here.
         Spark.post("/user", (req, res) -> {
             var message = req.body();
+
+
 
 
             System.out.println(message);

@@ -7,11 +7,11 @@ import org.eclipse.jetty.server.Authentication;
 
 import java.util.HashMap;
 
-public class userService extends ServiceLayer {
-    private AuthDAO authDAO;
-    private UserDAO userDAO;
+public class UserService extends ServiceLayer {
+    private final AuthDAO authDAO;
+    private final UserDAO userDAO;
 
-    public userService(AuthDAO authDAO, UserDAO userDAO) {
+    public UserService(AuthDAO authDAO, UserDAO userDAO) {
         this.authDAO = authDAO;
         this.userDAO = userDAO;
     }

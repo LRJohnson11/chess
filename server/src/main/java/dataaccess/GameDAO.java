@@ -14,7 +14,7 @@ public interface GameDAO {
 
     public GameData getGame(int gameId);
 
-    public boolean updateGame(int gameId, ChessGame.TeamColor color, UserData user);
+    public boolean updateGame(int gameId, ChessGame.TeamColor color, String username);
 
     public boolean clear();
 }

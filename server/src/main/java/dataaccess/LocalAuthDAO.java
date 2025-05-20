@@ -23,7 +23,7 @@ public class LocalAuthDAO implements AuthDAO{
 
     @Override
     public boolean deleteAuth(String authToken) {
-        String username = tokenMap.get(authToken).getUsername();
+        String username = tokenMap.get(authToken).username();
         usernameMap.remove(username);
         tokenMap.remove(authToken);
         return true;
