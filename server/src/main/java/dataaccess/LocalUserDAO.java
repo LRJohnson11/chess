@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class LocalUserDAO implements UserDAO{
-    private Map<String, UserData> users;
+    private final Map<String, UserData> users;
 
     public LocalUserDAO() {
         this.users = new HashMap<>();

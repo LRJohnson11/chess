@@ -10,13 +10,13 @@ import java.util.Collection;
 
 public interface GameDAO {
 
-    public CreateGameResponse createGame(String name);
+    CreateGameResponse createGame(String name);
 
-    public GetGamesResponse listGames();
+    GetGamesResponse listGames();
 
-    public GameData getGame(int gameId);
+    GameData getGame(int gameId);
 
-    public boolean updateGame(int gameId, ChessGame.TeamColor color, String username);
+    boolean updateGame(int gameId, ChessGame.TeamColor color, String username);
 
-    public boolean clear();
+    boolean clear();
 }

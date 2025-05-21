@@ -8,7 +8,7 @@ import server.response.GetGamesResponse;
 import java.util.*;
 
 public class LocalGameDAO implements GameDAO{
-    private Map<Integer,GameData> games;
+    private final Map<Integer,GameData> games;
 
     public LocalGameDAO(){
         this.games = new HashMap<>();

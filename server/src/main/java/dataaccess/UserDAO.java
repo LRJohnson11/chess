@@ -4,9 +4,9 @@ import model.UserData;
 
 public interface UserDAO {
 
-    public boolean createUser(String username, String password, String email);
+    boolean createUser(String username, String password, String email);
 
-    public UserData getUserByUsername(String username);
+    UserData getUserByUsername(String username);
 
-    public boolean clear();
+    boolean clear();
 }
