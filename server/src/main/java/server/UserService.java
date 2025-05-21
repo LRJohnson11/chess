@@ -2,12 +2,10 @@ package server;
 
 import dataaccess.AuthDAO;
 import dataaccess.UserDAO;
+import model.AuthData;
 import model.UserData;
-import org.eclipse.jetty.server.Authentication;
 
-import java.util.HashMap;
-
-public class UserService extends ServiceLayer {
+public class UserService  {
     private final AuthDAO authDAO;
     private final UserDAO userDAO;
 
@@ -16,23 +14,34 @@ public class UserService extends ServiceLayer {
         this.userDAO = userDAO;
     }
 
-    public String registerUser(String username, String password, String email){
-        if(userDAO.getUserByUsername(username)!= null){
+    public String registerUser(RegisterUserRequest request){
+        if(userDAO.getUserByUsername(request.username())!= null){
             throw new RuntimeException("username is not unique!");
         }
-        userDAO.createUser(username,password,email);
-        return authDAO.createAuth(username);
+        userDAO.createUser(request.username(),request.password(), request.email());
+        return authDAO.createAuth(request.username());
     }
 
-    public String loginUser(String username, String password){
-        UserData user = userDAO.getUserByUsername(username);
-        if(user.getPassword().equals(password)){
-            //throw error
+    public String loginUser(LoginRequest request){
+        UserData user = userDAO.getUserByUsername(request.username());
+        if(!user.password().equals(request.password())){
+            throw new RuntimeException("bad request");
         }
-        return authDAO.createAuth(username);
+        return authDAO.createAuth(request.username());
     }
 
     public boolean logoutUser(String authToken){
         return authDAO.deleteAuth(authToken);
+    }
+
+    public AuthData getAuth(String authToken){
+        return authDAO.getAuth(authToken);
+    }
+
+    public void clearAuth(){
+        authDAO.clear();
+    }
+    public void clearUsers(){
+        userDAO.clear();
     }
 }

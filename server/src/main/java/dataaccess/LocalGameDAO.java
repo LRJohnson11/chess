@@ -11,11 +11,12 @@ public class LocalGameDAO implements GameDAO{
     public LocalGameDAO(){
         this.games = new HashMap<>();
     }
+
     @Override
-    public boolean createGame(String name) {
+    public int createGame(String name) {
         int gameId = games.size() + 1;
         games.put(gameId, new GameData(gameId, null, null, name, new ChessGame()));
-        return true;
+        return gameId;
     }
 
     @Override
@@ -37,6 +38,7 @@ public class LocalGameDAO implements GameDAO{
         else{
             games.put(gameId, new GameData(gameId, game.whiteUsername(), username, game.gameName(), game.game()));
         }
+        return true;
     }
 
     @Override

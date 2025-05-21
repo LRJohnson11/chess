@@ -8,7 +8,7 @@ import java.util.Collection;
 
 public interface GameDAO {
 
-    public boolean createGame(String name);
+    public int createGame(String name);
 
     public Collection<GameData> listGames();
 
