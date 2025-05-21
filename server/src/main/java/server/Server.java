@@ -1,6 +1,7 @@
 package server;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import dataaccess.*;
 import model.AuthData;
 import model.GameData;
@@ -16,7 +17,7 @@ import java.util.Collection;
 import java.util.Map;
 
 public class Server {
-    private final Gson gson = new Gson();
+    private final Gson gson = new GsonBuilder().serializeNulls().create();
     private final AuthDAO localAuthDAO = new LocalAuthDAO();
     private final UserDAO localUserDAO = new LocalUserDAO();
     private final GameDAO localGameDAO = new LocalGameDAO();
@@ -147,11 +148,6 @@ public class Server {
             res.status(200);
             return "";
         });
-
-//        Spark.exception(apiException.class, ((e, request, response) -> {
-//            response.status(e.getStatus());
-//            response.body(gson.toJson(e.getMessage()));
-//        }));
 
 
         //This line initializes the server and can be removed once you have a functioning endpoint 
