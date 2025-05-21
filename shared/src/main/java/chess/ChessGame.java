@@ -89,17 +89,26 @@ private ChessBoard gameBoard;
             if(gameBoard.getPiece(move.getStartPosition()).getTeamColor() == teamTurn) {
                 legalMoves.addAll(validMoves(move.getStartPosition()));
             }
-            else throw new InvalidMoveException("wrong turn");
+            else{
+                throw new InvalidMoveException("wrong turn");
+            }
         }
         if(legalMoves.contains(move)){
             if(move.getPromotionPiece() != null){
                 this.gameBoard.addPiece(move.getEndPosition(), new ChessPiece(teamTurn, move.getPromotionPiece()));
             }
-            else this.gameBoard.addPiece(move.getEndPosition(), this.gameBoard.getPiece(move.getStartPosition()));
+            else{
+                this.gameBoard.addPiece(move.getEndPosition(), this.gameBoard.getPiece(move.getStartPosition()));
+            }
             this.gameBoard.addPiece(move.getStartPosition(), null);
-            if(this.teamTurn == TeamColor.WHITE) teamTurn = TeamColor.BLACK;
-            else teamTurn = TeamColor.WHITE;
-        }else {
+            if(this.teamTurn == TeamColor.WHITE){
+                teamTurn = TeamColor.BLACK;
+            }
+            else{
+                teamTurn = TeamColor.WHITE;
+            }
+        }
+        else {
             throw new InvalidMoveException("invalid move");
         }
     }

@@ -53,7 +53,9 @@ public class UserServiceTests {
 
         if(!Objects.equals(loginData.authToken(), auth.authToken())){
             assert true;
-        } else assert false;
+        } else{
+            assert false;
+        }
 
     }
 
@@ -114,7 +116,9 @@ public class UserServiceTests {
         AuthData auth = userService.getAuth("abcdef");
         if(auth == null){
             assert true;
-        }else assert false;
+        }else{
+            assert false;
+        }
     }
 
     @Test
@@ -127,7 +131,9 @@ public class UserServiceTests {
 
         if(retrievedAuthData == null){
             assert true;
-        }else assert false;
+        }else{
+            assert false;
+        }
 
     }
 
