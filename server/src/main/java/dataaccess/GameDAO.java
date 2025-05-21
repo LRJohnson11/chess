@@ -3,14 +3,16 @@ package dataaccess;
 import chess.ChessGame;
 import model.GameData;
 import model.UserData;
+import server.response.CreateGameResponse;
+import server.response.GetGamesResponse;
 
 import java.util.Collection;
 
 public interface GameDAO {
 
-    public int createGame(String name);
+    public CreateGameResponse createGame(String name);
 
-    public Collection<GameData> listGames();
+    public GetGamesResponse listGames();
 
     public GameData getGame(int gameId);
 

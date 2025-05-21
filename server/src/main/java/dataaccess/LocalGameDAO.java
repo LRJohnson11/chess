@@ -2,6 +2,8 @@ package dataaccess;
 
 import chess.ChessGame;
 import model.GameData;
+import server.response.CreateGameResponse;
+import server.response.GetGamesResponse;
 
 import java.util.*;
 
@@ -13,15 +15,15 @@ public class LocalGameDAO implements GameDAO{
     }
 
     @Override
-    public int createGame(String name) {
+    public CreateGameResponse createGame(String name) {
         int gameId = games.size() + 1;
         games.put(gameId, new GameData(gameId, null, null, name, new ChessGame()));
-        return gameId;
+        return new CreateGameResponse(gameId);
     }
 
     @Override
-    public Collection<GameData> listGames() {
-        return new ArrayList<>(games.values());
+    public GetGamesResponse listGames() {
+        return new GetGamesResponse(new ArrayList<>(games.values()));
     }
 
     @Override

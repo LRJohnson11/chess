@@ -1,8 +1,11 @@
 package server;
 
-import dataaccess.AuthDAO;
 import dataaccess.GameDAO;
 import model.GameData;
+import server.request.CreateGameRequest;
+import server.request.JoinGameRequest;
+import server.response.CreateGameResponse;
+import server.response.GetGamesResponse;
 
 import java.util.Collection;
 
@@ -13,12 +16,16 @@ public class GameService {
         this.gameDAO = gameDAO;
     }
 
-    public Collection<GameData> listGames(){
+    public GetGamesResponse listGames(){
         return gameDAO.listGames();
     }
 
-    public int createGame(CreateGameRequest request){
-        return gameDAO.createGame(request.gameName());
+    public CreateGameResponse createGame(CreateGameRequest request){
+        if(!request.validRequest()) {
+            throw new apiException(400, "Error: bad request");
+        }
+            return gameDAO.createGame(request.gameName());
+
     }
 
     public void joinGame(JoinGameRequest request, String username){
