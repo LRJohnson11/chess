@@ -28,8 +28,6 @@ public class Server {
     public int run(int desiredPort) {
         Spark.port(desiredPort);
         Spark.staticFiles.location("web");
-
-        //register a user
         Spark.post("/user", (req, res) -> {
             try {
                 RegisterUserRequest request = gson.fromJson(req.body(), RegisterUserRequest.class);
@@ -41,21 +39,17 @@ public class Server {
                 return gson.toJson(Map.of("message", e.getMessage()));
             }
         });
-        //login
         Spark.post("/session", (req,res) -> {
             try {
                 LoginRequest request = gson.fromJson(req.body(), LoginRequest.class);
                 AuthData user = userService.loginUser(request);
                 res.type("application/json");
-                res.status(200);
                 return gson.toJson(user);
             }catch (ApiException e){
                 res.status(e.getStatus());
                 return gson.toJson(Map.of("message", e.getMessage()));
             }
         });
-
-        //logout
         Spark.delete("/session", (req,res) -> {
             try {
                 String authToken = req.headers("authorization");
@@ -64,14 +58,12 @@ public class Server {
                 }
                 var result = userService.logoutUser(authToken);
                 res.type("application/json");
-                res.status(200);
                 return "";
             } catch (ApiException e) {
                 res.status(e.getStatus());
                 return gson.toJson(Map.of("message", e.getMessage()));
             }
         });
-
         Spark.get("/game", (req,res) -> {
             try{
             String authToken = req.headers("authorization");
@@ -80,14 +72,12 @@ public class Server {
             }
             GetGamesResponse games = gameService.listGames();
             res.type("application/json");
-            res.status(200);
             return gson.toJson(games);
             } catch (ApiException e) {
                 res.status(e.getStatus());
                 return gson.toJson(Map.of("message", e.getMessage()));
             }
         });
-
         Spark.post( "/game", (req, res) -> {
             try {
                 String authToken = req.headers("authorization");
@@ -97,7 +87,6 @@ public class Server {
                 }
                 CreateGameRequest request = gson.fromJson(req.body(), CreateGameRequest.class);
                 CreateGameResponse response = gameService.createGame(request);
-                res.status(200);
                 res.type("application/json");
                 return gson.toJson(response);
             }catch (ApiException e) {
@@ -105,7 +94,6 @@ public class Server {
                 return gson.toJson(Map.of("message", e.getMessage()));
             }
         });
-
         Spark.put("/game", (req,res) -> {
             try{
             String authToken = req.headers("authorization");
@@ -123,16 +111,13 @@ public class Server {
                 return gson.toJson(Map.of("message", e.getMessage()));
             }
         });
-        //clear db
         Spark.delete("/db", (req,res) -> {
             userService.clearUsers();
             userService.clearAuth();
             gameService.clearGames();
             res.type("application/json");
-            res.status(200);
             return "";
         });
-
         Spark.awaitInitialization();
         return Spark.port();
     }
