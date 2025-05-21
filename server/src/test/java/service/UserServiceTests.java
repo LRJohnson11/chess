@@ -1,11 +1,10 @@
-package passoff;
+package service;
 
 import dataaccess.AuthDAO;
 import dataaccess.LocalAuthDAO;
 import dataaccess.LocalUserDAO;
 import dataaccess.UserDAO;
 import model.AuthData;
-import model.UserData;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import server.UserService;

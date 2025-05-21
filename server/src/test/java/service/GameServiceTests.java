@@ -1,4 +1,4 @@
-package passoff;
+package service;
 
 import chess.ChessGame;
 import dataaccess.GameDAO;
@@ -14,8 +14,6 @@ import server.response.CreateGameResponse;
 import server.response.GetGamesResponse;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Objects;
 
 public class GameServiceTests {
     GameDAO gameDao = new LocalGameDAO();
