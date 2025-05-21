@@ -178,14 +178,12 @@ public class ChessPiece {
         for(int x : dx){
             positionToCheck = new ChessPosition(pos.getRow() + direction, pos.getColumn() + x);
             if(checkValidPosition(positionToCheck)){
-                if(board.getPiece(positionToCheck) != null){
-                    if(board.getPiece(positionToCheck).getTeamColor() != this.pieceColor){
+                if(board.getPiece(positionToCheck) != null && board.getPiece(positionToCheck).getTeamColor() != this.pieceColor){
                         if(pawnCanPromote(positionToCheck)){
                             moves.addAll(getPawnPromotionMoves(pos,positionToCheck));
                         }else {
                             moves.add(new ChessMove(pos, positionToCheck, null));
                         }
-                    }
                 }
             }
 
