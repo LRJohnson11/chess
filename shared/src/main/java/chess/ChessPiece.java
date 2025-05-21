@@ -233,10 +233,12 @@ public class ChessPiece {
     }
 
     private boolean checkPawnFirstMove(ChessPosition pos){
-        return (pos.getRow() ==2 && this.pieceColor == ChessGame.TeamColor.WHITE) || (pos.getRow() == 7 && this.pieceColor == ChessGame.TeamColor.BLACK);
+        return (pos.getRow() ==2 && this.pieceColor == ChessGame.TeamColor.WHITE) ||
+                (pos.getRow() == 7 && this.pieceColor == ChessGame.TeamColor.BLACK);
     }
 
     private boolean pawnCanPromote(ChessPosition pos){
-        return (pos.getRow() ==8 && this.pieceColor == ChessGame.TeamColor.WHITE) || (pos.getRow() == 1 && this.pieceColor == ChessGame.TeamColor.BLACK);
+        return (pos.getRow() ==8 && this.pieceColor == ChessGame.TeamColor.WHITE) ||
+                (pos.getRow() == 1 && this.pieceColor == ChessGame.TeamColor.BLACK);
     }
 }
