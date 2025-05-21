@@ -29,7 +29,6 @@ public class Server {
 
     public int run(int desiredPort) {
         Spark.port(desiredPort);
-
         Spark.staticFiles.location("web");
 
         //register a user
@@ -37,9 +36,6 @@ public class Server {
             try {
                 RegisterUserRequest request = gson.fromJson(req.body(), RegisterUserRequest.class);
                 AuthData user = userService.registerUser(request);
-
-
-                System.out.println(request.toString());
                 res.type("application/json");
                 return gson.toJson(user);
             } catch (apiException e) {
@@ -47,12 +43,10 @@ public class Server {
                 return gson.toJson(Map.of("message", e.getMessage()));
             }
         });
-
         //login
         Spark.post("/session", (req,res) -> {
             try {
                 LoginRequest request = gson.fromJson(req.body(), LoginRequest.class);
-
                 AuthData user = userService.loginUser(request);
                 res.type("application/json");
                 res.status(200);
@@ -70,7 +64,6 @@ public class Server {
                 if(userService.getAuth(authToken) == null){
                     throw new apiException(401, "Error: unauthorized");
                 }
-
                 var result = userService.logoutUser(authToken);
                 res.type("application/json");
                 res.status(200);
@@ -83,7 +76,6 @@ public class Server {
 
         Spark.get("/game", (req,res) -> {
             try{
-            System.out.println("list games");
             String authToken = req.headers("authorization");
             if(userService.getAuth(authToken) == null){
                 throw new apiException(401, "Error: user not logged in");
@@ -100,7 +92,6 @@ public class Server {
 
         Spark.post( "/game", (req, res) -> {
             try {
-                System.out.println("create game");
                 String authToken = req.headers("authorization");
                 AuthData user = userService.getAuth(authToken);
                 if (user == null) {
@@ -110,7 +101,6 @@ public class Server {
                 CreateGameResponse response = gameService.createGame(request);
                 res.status(200);
                 res.type("application/json");
-
                 return gson.toJson(response);
             }catch (apiException e) {
                 res.status(e.getStatus());
@@ -120,7 +110,6 @@ public class Server {
 
         Spark.put("/game", (req,res) -> {
             try{
-            System.out.println("join game");
             String authToken = req.headers("authorization");
             AuthData user = userService.getAuth(authToken);
             if(user == null){
@@ -138,20 +127,13 @@ public class Server {
         });
         //clear db
         Spark.delete("/db", (req,res) -> {
-            System.out.println("clearing the db");
             userService.clearUsers();
             userService.clearAuth();
             gameService.clearGames();
-
-
             res.type("application/json");
             res.status(200);
             return "";
         });
-
-
-        //This line initializes the server and can be removed once you have a functioning endpoint 
-        Spark.init();
 
         Spark.awaitInitialization();
         return Spark.port();
