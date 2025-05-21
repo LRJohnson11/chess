@@ -2,7 +2,9 @@ package server;
 
 import com.google.gson.Gson;
 import dataaccess.*;
+import model.AuthData;
 import model.GameData;
+import model.UserData;
 import spark.*;
 
 import java.util.Collection;
@@ -86,27 +88,42 @@ public class Server {
         Spark.post( "/game", (req, res) -> {
             System.out.println("create game");
             String authToken = req.headers("authorization");
-            if(userService.getAuth(authToken) == null){
+            AuthData user = userService.getAuth(authToken);
+            if(user == null){
                 throw new RuntimeException("user not logged in");
             }
+            CreateGameRequest request = gson.fromJson(req.body(), CreateGameRequest.class);
+            int gameId = gameService.createGame(request);
+            res.status(200);
+            res.type("application/json");
 
-            return "create game";
+            return gson.toJson(gameId);
         });
 
         Spark.put("/game", (req,res) -> {
             System.out.println("join game");
-            return "join game";
+            String authToken = req.headers("authorization");
+            AuthData user = userService.getAuth(authToken);
+            if(user == null){
+                throw new RuntimeException("user not logged in");
+            }
+            JoinGameRequest request = gson.fromJson(req.body(), JoinGameRequest.class);
+            gameService.joinGame(request, user.username());
+            res.status(200);
+            res.type("application/json");
+            return "";
         });
         //clear db
         Spark.delete("/db", (req,res) -> {
             System.out.println("clearing the db");
             userService.clearUsers();
             userService.clearAuth();
+            gameService.clearGames();
 
 
-            System.out.println("/user endpoint has been called");
             res.type("application/json");
-            return "success";
+            res.status(200);
+            return "";
         });
 
 

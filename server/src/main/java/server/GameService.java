@@ -17,12 +17,12 @@ public class GameService {
         return gameDAO.listGames();
     }
 
-    public int createGame(String gameName){
-        return gameDAO.createGame(gameName);
+    public int createGame(CreateGameRequest request){
+        return gameDAO.createGame(request.gameName());
     }
 
-    public void joinGame(JoinGameRequest request){
-
+    public void joinGame(JoinGameRequest request, String username){
+        gameDAO.updateGame(request.gameID(),request.playerColor(), username);
     }
 
     public void clearGames(){
