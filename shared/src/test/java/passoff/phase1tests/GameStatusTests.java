@@ -1,4 +1,4 @@
-package passoff.phase1Tests;
+package passoff.phase1tests;
 
 import chess.ChessGame;
 import org.junit.jupiter.api.Assertions;
