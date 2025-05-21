@@ -163,10 +163,7 @@ public class ChessPiece {
         ChessPosition positionToCheck = new ChessPosition(pos.getRow() +direction, pos.getColumn());
         if(board.getPiece(positionToCheck) == null){
             if(pawnCanPromote(positionToCheck)){
-                moves.add(new ChessMove(pos, positionToCheck, PieceType.QUEEN));
-                moves.add(new ChessMove(pos, positionToCheck, PieceType.BISHOP));
-                moves.add(new ChessMove(pos, positionToCheck, PieceType.ROOK));
-                moves.add(new ChessMove(pos, positionToCheck, PieceType.KNIGHT));
+                moves.addAll(getPawnPromotionMoves(pos,positionToCheck));
             }
             else{
                 moves.add(new ChessMove(pos, positionToCheck, null));
@@ -184,10 +181,7 @@ public class ChessPiece {
                 if(board.getPiece(positionToCheck) != null){
                     if(board.getPiece(positionToCheck).getTeamColor() != this.pieceColor){
                         if(pawnCanPromote(positionToCheck)){
-                            moves.add(new ChessMove(pos, positionToCheck, PieceType.QUEEN));
-                            moves.add(new ChessMove(pos, positionToCheck, PieceType.BISHOP));
-                            moves.add(new ChessMove(pos, positionToCheck, PieceType.ROOK));
-                            moves.add(new ChessMove(pos, positionToCheck, PieceType.KNIGHT));
+                            moves.addAll(getPawnPromotionMoves(pos,positionToCheck));
                         }else {
                             moves.add(new ChessMove(pos, positionToCheck, null));
                         }
@@ -196,6 +190,15 @@ public class ChessPiece {
             }
 
         }
+
+        return moves;
+    }
+    private Collection<ChessMove> getPawnPromotionMoves(ChessPosition start, ChessPosition end){
+        ArrayList<ChessMove> moves = new ArrayList<>();
+        moves.add(new ChessMove(start, end , PieceType.QUEEN));
+        moves.add(new ChessMove(start, end, PieceType.BISHOP));
+        moves.add(new ChessMove(start, end, PieceType.ROOK));
+        moves.add(new ChessMove(start, end, PieceType.KNIGHT));
 
         return moves;
     }
