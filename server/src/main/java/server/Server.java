@@ -81,15 +81,20 @@ public class Server {
         });
 
         Spark.get("/game", (req,res) -> {
+            try{
             System.out.println("list games");
             String authToken = req.headers("authorization");
             if(userService.getAuth(authToken) == null){
-                throw new RuntimeException("user not logged in");
+                throw new apiException(401, "Error: user not logged in");
             }
             GetGamesResponse games = gameService.listGames();
             res.type("application/json");
             res.status(200);
             return gson.toJson(games);
+            } catch (apiException e) {
+                res.status(e.getStatus());
+                return gson.toJson(Map.of("message", e.getMessage()));
+            }
         });
 
         Spark.post( "/game", (req, res) -> {
@@ -113,17 +118,22 @@ public class Server {
         });
 
         Spark.put("/game", (req,res) -> {
+            try{
             System.out.println("join game");
             String authToken = req.headers("authorization");
             AuthData user = userService.getAuth(authToken);
             if(user == null){
-                throw new RuntimeException("user not logged in");
+                throw new apiException(401, "Error: unauthenticated");
             }
             JoinGameRequest request = gson.fromJson(req.body(), JoinGameRequest.class);
             gameService.joinGame(request, user.username());
             res.status(200);
             res.type("application/json");
             return "";
+            } catch (apiException e) {
+                res.status(e.getStatus());
+                return gson.toJson(Map.of("message", e.getMessage()));
+            }
         });
         //clear db
         Spark.delete("/db", (req,res) -> {

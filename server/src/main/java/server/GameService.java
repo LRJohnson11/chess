@@ -1,5 +1,6 @@
 package server;
 
+import chess.ChessGame;
 import dataaccess.GameDAO;
 import model.GameData;
 import server.request.CreateGameRequest;
@@ -29,6 +30,19 @@ public class GameService {
     }
 
     public void joinGame(JoinGameRequest request, String username){
+        if(!request.valid()){
+            throw new apiException(400, "Error: bad request");
+        }
+        GameData game = gameDAO.getGame(request.gameID());
+        if(game == null){
+            throw new apiException(401, "Error: bad request");
+        }
+        if(request.playerColor() == ChessGame.TeamColor.WHITE && game.whiteUsername() != null){
+            throw new apiException(403, "Error: already taken");
+        }
+        if(request.playerColor() == ChessGame.TeamColor.BLACK && game.blackUsername() != null){
+            throw new apiException(403, "Error: already taken");
+        }
         gameDAO.updateGame(request.gameID(),request.playerColor(), username);
     }
 
