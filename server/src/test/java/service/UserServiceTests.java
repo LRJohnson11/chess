@@ -8,7 +8,7 @@ import model.AuthData;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import server.UserService;
-import server.apiException;
+import server.ApiException;
 import server.request.LoginRequest;
 import server.request.RegisterUserRequest;
 
@@ -37,7 +37,7 @@ public class UserServiceTests {
             AuthData duplicateAuth = userService.registerUser(request);
 
             assert false;
-        } catch (apiException e){
+        } catch (ApiException e){
             assert true;
         }
 
@@ -69,7 +69,7 @@ public class UserServiceTests {
             AuthData loginData = userService.loginUser(new LoginRequest("user", "password"));
             assert false;
         }
-        catch (apiException e) {
+        catch (ApiException e) {
             assert true;
         }
 
@@ -83,7 +83,7 @@ public class UserServiceTests {
             AuthData auth = userService.registerUser(request);
             userService.logoutUser(auth.authToken());
             assert true;
-        } catch (apiException e) {
+        } catch (ApiException e) {
             assert false;
         }
 
@@ -95,7 +95,7 @@ public class UserServiceTests {
         try {
             userService.logoutUser("abcde");
             assert false;
-        } catch (apiException e) {
+        } catch (ApiException e) {
             assert true;
         }
     }

@@ -1,7 +1,7 @@
 package dataaccess;
 
 import model.AuthData;
-import server.apiException;
+import server.ApiException;
 
 import java.util.*;
 
@@ -26,7 +26,7 @@ public class LocalAuthDAO implements AuthDAO{
     public boolean deleteAuth(String authToken) {
         AuthData auth = tokenMap.get(authToken);
         if(auth == null){
-            throw new apiException(400, "bad request");
+            throw new ApiException(400, "bad request");
         }
         usernameMap.remove(auth.username());
         tokenMap.remove(authToken);

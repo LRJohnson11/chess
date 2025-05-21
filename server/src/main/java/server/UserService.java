@@ -18,10 +18,10 @@ public class UserService  {
 
     public AuthData registerUser(RegisterUserRequest request){
         if(request.username() == null || request.password() == null || request.email() == null){
-            throw new apiException(400, "Error: bad request");
+            throw new ApiException(400, "Error: bad request");
         }
         if(userDAO.getUserByUsername(request.username())!= null){
-            throw new apiException(403, "Error: already taken");
+            throw new ApiException(403, "Error: already taken");
         }
         userDAO.createUser(request.username(),request.password(), request.email());
         return authDAO.createAuth(request.username());
@@ -29,14 +29,14 @@ public class UserService  {
 
     public AuthData loginUser(LoginRequest request){
         if(!request.validateRequest()){
-            throw new apiException(400, "Error: bad request");
+            throw new ApiException(400, "Error: bad request");
         }
         UserData user = userDAO.getUserByUsername(request.username());
         if(user == null){
-            throw new apiException(401, "Error: unauthorized");
+            throw new ApiException(401, "Error: unauthorized");
         }
         if(!user.password().equals(request.password())){
-            throw new apiException(401, "Error: unauthorized");
+            throw new ApiException(401, "Error: unauthorized");
         }
         return authDAO.createAuth(request.username());
     }

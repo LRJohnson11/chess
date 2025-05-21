@@ -7,7 +7,7 @@ import model.GameData;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import server.GameService;
-import server.apiException;
+import server.ApiException;
 import server.request.CreateGameRequest;
 import server.request.JoinGameRequest;
 import server.response.CreateGameResponse;
@@ -53,7 +53,7 @@ public class GameServiceTests {
             CreateGameRequest gameRequest = new CreateGameRequest("");
             CreateGameResponse gameResponse = gameService.createGame(gameRequest);
             assert false;
-        } catch (apiException e){
+        } catch (ApiException e){
             assert true;
         }
 
@@ -84,7 +84,7 @@ public class GameServiceTests {
             gameService.joinGame(joinGameRequest, "username");
 
             assert false;
-        }catch (apiException e){
+        }catch (ApiException e){
             assert true;
         }
 

@@ -1,9 +1,9 @@
 package server;
 
-public class apiException extends RuntimeException{
+public class ApiException extends RuntimeException{
     private final int status;
 
-    public  apiException(int status, String message){
+    public ApiException(int status, String message){
         super(message);
         this.status = status;
 

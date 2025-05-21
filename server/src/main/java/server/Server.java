@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import dataaccess.*;
 import model.AuthData;
-import model.GameData;
 import server.request.CreateGameRequest;
 import server.request.JoinGameRequest;
 import server.request.LoginRequest;
@@ -13,7 +12,6 @@ import server.response.CreateGameResponse;
 import server.response.GetGamesResponse;
 import spark.*;
 
-import java.util.Collection;
 import java.util.Map;
 
 public class Server {
@@ -38,7 +36,7 @@ public class Server {
                 AuthData user = userService.registerUser(request);
                 res.type("application/json");
                 return gson.toJson(user);
-            } catch (apiException e) {
+            } catch (ApiException e) {
                 res.status(e.getStatus());
                 return gson.toJson(Map.of("message", e.getMessage()));
             }
@@ -51,7 +49,7 @@ public class Server {
                 res.type("application/json");
                 res.status(200);
                 return gson.toJson(user);
-            }catch (apiException e){
+            }catch (ApiException e){
                 res.status(e.getStatus());
                 return gson.toJson(Map.of("message", e.getMessage()));
             }
@@ -62,13 +60,13 @@ public class Server {
             try {
                 String authToken = req.headers("authorization");
                 if(userService.getAuth(authToken) == null){
-                    throw new apiException(401, "Error: unauthorized");
+                    throw new ApiException(401, "Error: unauthorized");
                 }
                 var result = userService.logoutUser(authToken);
                 res.type("application/json");
                 res.status(200);
                 return "";
-            } catch (apiException e) {
+            } catch (ApiException e) {
                 res.status(e.getStatus());
                 return gson.toJson(Map.of("message", e.getMessage()));
             }
@@ -78,13 +76,13 @@ public class Server {
             try{
             String authToken = req.headers("authorization");
             if(userService.getAuth(authToken) == null){
-                throw new apiException(401, "Error: user not logged in");
+                throw new ApiException(401, "Error: user not logged in");
             }
             GetGamesResponse games = gameService.listGames();
             res.type("application/json");
             res.status(200);
             return gson.toJson(games);
-            } catch (apiException e) {
+            } catch (ApiException e) {
                 res.status(e.getStatus());
                 return gson.toJson(Map.of("message", e.getMessage()));
             }
@@ -95,14 +93,14 @@ public class Server {
                 String authToken = req.headers("authorization");
                 AuthData user = userService.getAuth(authToken);
                 if (user == null) {
-                    throw new apiException(401, "Error: unauthenticated");
+                    throw new ApiException(401, "Error: unauthenticated");
                 }
                 CreateGameRequest request = gson.fromJson(req.body(), CreateGameRequest.class);
                 CreateGameResponse response = gameService.createGame(request);
                 res.status(200);
                 res.type("application/json");
                 return gson.toJson(response);
-            }catch (apiException e) {
+            }catch (ApiException e) {
                 res.status(e.getStatus());
                 return gson.toJson(Map.of("message", e.getMessage()));
             }
@@ -113,14 +111,14 @@ public class Server {
             String authToken = req.headers("authorization");
             AuthData user = userService.getAuth(authToken);
             if(user == null){
-                throw new apiException(401, "Error: unauthenticated");
+                throw new ApiException(401, "Error: unauthenticated");
             }
             JoinGameRequest request = gson.fromJson(req.body(), JoinGameRequest.class);
             gameService.joinGame(request, user.username());
             res.status(200);
             res.type("application/json");
             return "";
-            } catch (apiException e) {
+            } catch (ApiException e) {
                 res.status(e.getStatus());
                 return gson.toJson(Map.of("message", e.getMessage()));
             }

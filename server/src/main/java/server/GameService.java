@@ -8,8 +8,6 @@ import server.request.JoinGameRequest;
 import server.response.CreateGameResponse;
 import server.response.GetGamesResponse;
 
-import java.util.Collection;
-
 public class GameService {
     private final GameDAO gameDAO;
 
@@ -23,7 +21,7 @@ public class GameService {
 
     public CreateGameResponse createGame(CreateGameRequest request){
         if(!request.validRequest()) {
-            throw new apiException(400, "Error: bad request");
+            throw new ApiException(400, "Error: bad request");
         }
             return gameDAO.createGame(request.gameName());
 
@@ -31,17 +29,17 @@ public class GameService {
 
     public void joinGame(JoinGameRequest request, String username){
         if(!request.valid()){
-            throw new apiException(400, "Error: bad request");
+            throw new ApiException(400, "Error: bad request");
         }
         GameData game = gameDAO.getGame(request.gameID());
         if(game == null){
-            throw new apiException(401, "Error: bad request");
+            throw new ApiException(401, "Error: bad request");
         }
         if(request.playerColor() == ChessGame.TeamColor.WHITE && game.whiteUsername() != null){
-            throw new apiException(403, "Error: already taken");
+            throw new ApiException(403, "Error: already taken");
         }
         if(request.playerColor() == ChessGame.TeamColor.BLACK && game.blackUsername() != null){
-            throw new apiException(403, "Error: already taken");
+            throw new ApiException(403, "Error: already taken");
         }
         gameDAO.updateGame(request.gameID(),request.playerColor(), username);
     }
