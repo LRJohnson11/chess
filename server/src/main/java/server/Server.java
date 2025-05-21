@@ -30,34 +30,35 @@ public class Server {
         Spark.post("/user", (req, res) -> {
             try {
                 RegisterUserRequest request = gson.fromJson(req.body(), RegisterUserRequest.class);
-                String authToken = userService.registerUser(request);
+                AuthData user = userService.registerUser(request);
 
 
                 System.out.println(request.toString());
                 res.type("application/json");
-                return gson.toJson(Map.of("authToken", authToken));
-            } catch (Exception e) {
-                res.status(400);
-                return gson.toJson(Map.of("error", e.getMessage()));
+                return gson.toJson(user);
+            } catch (apiException e) {
+                res.status(e.getStatus());
+                return gson.toJson(e.getMessage());
             }
         });
+
         //login
         Spark.post("/session", (req,res) -> {
             try {
                 LoginRequest request = gson.fromJson(req.body(), LoginRequest.class);
 
-                String authToken = userService.loginUser(request);
+                AuthData user = userService.loginUser(request);
                 res.type("application/json");
                 res.status(200);
-                return gson.toJson(Map.of("authToken", authToken));
-            } catch (Exception e) {
-                res.status(400);
-                return gson.toJson(Map.of("error", e.getMessage()));
+                return gson.toJson(user);
+            }catch (apiException e){
+                res.status(e.getStatus());
+                return gson.toJson(Map.of("message", e.getMessage()));
             }
         });
         //logout
         Spark.delete("/session", (req,res) -> {
-            try {
+//            try {
                 String authToken = req.headers("authorization");
                 if(userService.getAuth(authToken) == null){
                     throw new RuntimeException("user not logged in");
@@ -67,10 +68,10 @@ public class Server {
                 res.type("application/json");
                 res.status(200);
                 return "";
-            } catch (Exception e) {
-                res.status(400);
-                return gson.toJson(Map.of("error", e.getMessage()));
-            }
+//            } catch (Exception e) {
+//                res.status(400);
+//                return gson.toJson(Map.of("error", e.getMessage()));
+//            }
         });
 
         Spark.get("/game", (req,res) -> {
@@ -125,6 +126,11 @@ public class Server {
             res.status(200);
             return "";
         });
+
+//        Spark.exception(apiException.class, ((e, request, response) -> {
+//            response.status(e.getStatus());
+//            response.body(gson.toJson(e.getMessage()));
+//        }));
 
 
         //This line initializes the server and can be removed once you have a functioning endpoint 

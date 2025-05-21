@@ -14,18 +14,27 @@ public class UserService  {
         this.userDAO = userDAO;
     }
 
-    public String registerUser(RegisterUserRequest request){
+    public AuthData registerUser(RegisterUserRequest request){
+        if(request.username() == null || request.password() == null || request.email() == null){
+            throw new apiException(400, "Error: bad request");
+        }
         if(userDAO.getUserByUsername(request.username())!= null){
-            throw new RuntimeException("username is not unique!");
+            throw new apiException(403, "Error: already taken");
         }
         userDAO.createUser(request.username(),request.password(), request.email());
         return authDAO.createAuth(request.username());
     }
 
-    public String loginUser(LoginRequest request){
+    public AuthData loginUser(LoginRequest request){
+        if(!request.validateRequest()){
+            throw new apiException(400, "Error: bad request");
+        }
         UserData user = userDAO.getUserByUsername(request.username());
+        if(user == null){
+            throw new apiException(401, "Error: unauthorized");
+        }
         if(!user.password().equals(request.password())){
-            throw new RuntimeException("bad request");
+            throw new apiException(401, "Error: unauthorized");
         }
         return authDAO.createAuth(request.username());
     }

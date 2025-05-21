@@ -14,11 +14,11 @@ public class LocalAuthDAO implements AuthDAO{
     }
 
     @Override
-    public String createAuth(String username) {
+    public AuthData createAuth(String username) {
         String authToken = generateToken();
         usernameMap.put(username, new AuthData(username, authToken));
         tokenMap.put(authToken, new AuthData(username,authToken));
-        return authToken;
+        return new AuthData(username, authToken);
     }
 
     @Override
