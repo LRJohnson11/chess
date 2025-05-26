@@ -12,7 +12,9 @@ import server.response.CreateGameResponse;
 import server.response.GetGamesResponse;
 import spark.*;
 
+import javax.xml.crypto.Data;
 import java.util.Map;
+
 
 public class Server {
     private final Gson gson = new GsonBuilder().serializeNulls().create();
@@ -22,12 +24,18 @@ public class Server {
     private final UserService userService = new UserService(localAuthDAO, localUserDAO);
     private final GameService gameService = new GameService(localGameDAO);
 
+
     public Server() {
     }
 
     public int run(int desiredPort) {
         Spark.port(desiredPort);
         Spark.staticFiles.location("web");
+        try(var conn = DatabaseManager.getConnection()){
+            System.out.println("connected!");
+        } catch (Exception e){
+            System.out.println("did not connect!");
+        }
         Spark.post("/user", (req, res) -> {
             try {
                 RegisterUserRequest request = gson.fromJson(req.body(), RegisterUserRequest.class);
