@@ -27,6 +27,7 @@ public class DatabaseManager {
         } catch (SQLException ex) {
             throw new DataAccessException("failed to create database", ex);
         }
+        //create tables with schema
     }
 
     /**

@@ -12,17 +12,16 @@ import server.response.CreateGameResponse;
 import server.response.GetGamesResponse;
 import spark.*;
 
-import javax.xml.crypto.Data;
 import java.util.Map;
 
 
 public class Server {
     private final Gson gson = new GsonBuilder().serializeNulls().create();
-    private final AuthDAO localAuthDAO = new LocalAuthDAO();
-    private final UserDAO localUserDAO = new LocalUserDAO();
-    private final GameDAO localGameDAO = new LocalGameDAO();
-    private final UserService userService = new UserService(localAuthDAO, localUserDAO);
-    private final GameService gameService = new GameService(localGameDAO);
+    private final AuthDAO authDAO = new MySqlAuthDAO();
+    private final UserDAO userDAO = new MySqlUserDAO();
+    private final GameDAO gameDAO = new MySqlGameDAO();
+    private final UserService userService = new UserService(authDAO, userDAO);
+    private final GameService gameService = new GameService(gameDAO);
 
 
     public Server() {
@@ -31,11 +30,7 @@ public class Server {
     public int run(int desiredPort) {
         Spark.port(desiredPort);
         Spark.staticFiles.location("web");
-        try(var conn = DatabaseManager.getConnection()){
-            System.out.println("connected!");
-        } catch (Exception e){
-            System.out.println("did not connect!");
-        }
+
         Spark.post("/user", (req, res) -> {
             try {
                 RegisterUserRequest request = gson.fromJson(req.body(), RegisterUserRequest.class);

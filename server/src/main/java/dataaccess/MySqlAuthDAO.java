@@ -8,6 +8,14 @@ import java.sql.SQLException;
 import java.util.UUID;
 
 public class MySqlAuthDAO implements AuthDAO{
+
+    public MySqlAuthDAO(){
+        try {
+            configureAuthDB();
+        } catch (DataAccessException e) {
+            throw new ApiException(500, "failed to make auth tables");
+        }
+    }
     @Override
     public AuthData createAuth(String username) {
         String authToken = generateToken();
@@ -56,12 +64,19 @@ public class MySqlAuthDAO implements AuthDAO{
         } catch (Exception e) {
             throw new ApiException(500, "We had a DB error");
         }
-        return null;
     }
 
     @Override
     public boolean clear() {
-        return false;
+        try(var conn = DatabaseManager.getConnection()){
+            var statement = "TRUNCATE auth";
+            try( var ps = conn.prepareStatement(statement)){
+                ps.executeUpdate();
+            }
+        } catch (Exception e) {
+            throw new ApiException(500, "failed to update");
+        }
+        return true;
     }
 
     private String generateToken() {
@@ -72,6 +87,29 @@ public class MySqlAuthDAO implements AuthDAO{
         String username = rs.getString("username");
         String authToken = rs.getString("authToken");
         AuthData auth = new AuthData(username,authToken);
-        if(auth.valid())
+        if(auth.valid()){
+            return auth;
+        }
+        return null;
+    }
+
+    private void configureAuthDB() throws DataAccessException {
+        DatabaseManager.createDatabase();
+        var statement = """
+                CREATE TABLE IF NOT EXISTS auth (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    username VARCHAR(255) NOT NULL,
+                    auth_token VARCHAR(255) NOT NULL,
+                );
+                """;
+        try(var conn = DatabaseManager.getConnection()){
+            try(var ps = conn.prepareStatement(statement)){
+                ps.executeUpdate();
+            }
+        } catch (Exception e) {
+            throw new DataAccessException("failed to create tables");
+        }
+
+
     }
 }
