@@ -20,9 +20,9 @@ public class MySqlAuthDAO implements AuthDAO{
     public AuthData createAuth(String username) {
         String authToken = generateToken();
         try(var conn = DatabaseManager.getConnection()){
-            var statement = "INSERT into auth (username, authToken) values (?,?)";
+            var statement = "INSERT into auth (username, auth_token) values (?,?)";
             try(var ps = conn.prepareStatement(statement)){
-                ps.setString(1, "username");
+                ps.setString(1, username);
                 ps.setString(2, authToken);
                 ps.executeUpdate();
 
@@ -44,7 +44,7 @@ public class MySqlAuthDAO implements AuthDAO{
 
             }
         } catch (Exception e) {
-            throw new ApiException(500, "We had a DB error");
+            throw new ApiException(500, "Error deleting auth");
         }
         return true;
     }
@@ -53,7 +53,7 @@ public class MySqlAuthDAO implements AuthDAO{
     public AuthData getAuth(String authToken) {
 
         try(var conn = DatabaseManager.getConnection()){
-            var statement = "SELECT * from auth, where authToken = ?";
+            var statement = "SELECT * from auth where auth_token = ?";
             try(var ps = conn.prepareStatement(statement)){
                 ps.setString(1, authToken);
                 try(var rs = ps.executeQuery()){
@@ -62,7 +62,7 @@ public class MySqlAuthDAO implements AuthDAO{
 
             }
         } catch (Exception e) {
-            throw new ApiException(500, "We had a DB error");
+            throw new ApiException(500, "Error getting Auth");
         }
     }
 
@@ -84,11 +84,14 @@ public class MySqlAuthDAO implements AuthDAO{
     }
 
     private AuthData readAuth(ResultSet rs) throws SQLException {
-        String username = rs.getString("username");
-        String authToken = rs.getString("authToken");
-        AuthData auth = new AuthData(username,authToken);
-        if(auth.valid()){
-            return auth;
+        if(rs.next()) {
+            String username = rs.getString("username");
+            String authToken = rs.getString("auth_token");
+            AuthData auth = new AuthData(username, authToken);
+            if (auth.valid()) {
+                return auth;
+            }
+            return null;
         }
         return null;
     }
@@ -99,7 +102,7 @@ public class MySqlAuthDAO implements AuthDAO{
                 CREATE TABLE IF NOT EXISTS auth (
                     id INT AUTO_INCREMENT PRIMARY KEY,
                     username VARCHAR(255) NOT NULL,
-                    auth_token VARCHAR(255) NOT NULL,
+                    auth_token VARCHAR(255) NOT NULL
                 );
                 """;
         try(var conn = DatabaseManager.getConnection()){

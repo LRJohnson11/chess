@@ -9,38 +9,50 @@ import java.sql.SQLException;
 
 public class MySqlUserDAO implements UserDAO{
 
+    public MySqlUserDAO(){
+        try{
+            configureUserDB();
+        } catch (DataAccessException e) {
+            throw new ApiException(500, "failed to make user table");
+        }
+    }
+
     @Override
     public boolean createUser(String username, String password, String email) {
         try(var conn = DatabaseManager.getConnection()){
-            var statement = "INSERT into USERS, (username, password, email) VALUES (1,2,3)";
+            var statement = "INSERT into users (username, password, email) VALUES (?,?,?)";
             var hashPassword = BCrypt.hashpw(password, BCrypt.gensalt());
             try(var ps = conn.prepareStatement(statement)) {
-                ps.setString(1, "username");
-                ps.setString(2, "password");
-                ps.setString(3, "email");
+                ps.setString(1, username);
+                ps.setString(2, hashPassword);
+                ps.setString(3, email);
                 ps.executeUpdate();
             }
 
         }catch(Exception e){
-            throw new ApiException(500, "internal errror");
+            throw new ApiException(500, "there was an error creating the user in the DB");
         }
         return true;
     }
 
     @Override
     public UserData getUserByUsername(String username) {
-        UserData user;
         try(var conn = DatabaseManager.getConnection()){
             var statement = "SELECT * from users where username=?";
             try(var ps = conn.prepareStatement(statement)){
                 ps.setString(1, "username");
                 try(var rs = ps.executeQuery()){
-                    return readUser(rs);
+                    if(rs.next()) {
+                        return readUser(rs);
+                    }
+                    else{
+                        return null;
+                    }
                 }
 
             }
         } catch (Exception e) {
-            throw new ApiException(500, "We had a DB error");
+            throw new ApiException(500, "There was an error getting a user by username");
         }
     }
 
@@ -52,7 +64,7 @@ public class MySqlUserDAO implements UserDAO{
                 ps.executeUpdate();
             }
         } catch (Exception e) {
-            throw new ApiException(500, "failed to update");
+            throw new ApiException(500, "failed to clear users");
         }
         return true;
     }
@@ -66,5 +78,25 @@ public class MySqlUserDAO implements UserDAO{
             return user;
         }
         return null;
+    }
+
+    private void configureUserDB() throws DataAccessException {
+        DatabaseManager.createDatabase();
+        var statement = """
+                CREATE TABLE IF NOT EXISTS users (
+                    username VARCHAR(255) PRIMARY KEY,
+                    password VARCHAR(255) NOT NULL,
+                    email VARCHAR(255) NOT NULL
+                );
+                """;
+        try(var conn = DatabaseManager.getConnection()){
+            try(var ps = conn.prepareStatement(statement)){
+                ps.executeUpdate();
+            }
+        } catch (Exception e) {
+            throw new DataAccessException("failed to create tables");
+        }
+
+
     }
 }

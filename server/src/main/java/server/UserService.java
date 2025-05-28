@@ -4,6 +4,7 @@ import dataaccess.AuthDAO;
 import dataaccess.UserDAO;
 import model.AuthData;
 import model.UserData;
+import org.mindrot.jbcrypt.BCrypt;
 import server.request.LoginRequest;
 import server.request.RegisterUserRequest;
 
@@ -35,7 +36,8 @@ public class UserService  {
         if(user == null){
             throw new ApiException(401, "Error: unauthorized");
         }
-        if(!user.password().equals(request.password())){
+        var hashedPassword = user.password();
+        if(!BCrypt.checkpw(request.password(), hashedPassword)){
             throw new ApiException(401, "Error: unauthorized");
         }
         return authDAO.createAuth(request.username());
