@@ -3,7 +3,9 @@ package service;
 import chess.ChessGame;
 import dataaccess.GameDAO;
 import dataaccess.LocalGameDAO;
+import dataaccess.MySqlGameDAO;
 import model.GameData;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import server.GameService;
@@ -16,7 +18,7 @@ import server.response.GetGamesResponse;
 import java.util.ArrayList;
 
 public class GameServiceTests {
-    GameDAO gameDao = new LocalGameDAO();
+    GameDAO gameDao = new MySqlGameDAO();
     GameService gameService = new GameService(gameDao);
 
     @Test
@@ -99,6 +101,11 @@ public class GameServiceTests {
         GetGamesResponse emptylistResponse = gameService.listGames();
         
         assert emptylistResponse.games().isEmpty();
+    }
+
+    @BeforeEach
+    public void cleanGameDb(){
+        gameService.clearGames();
     }
 
 }

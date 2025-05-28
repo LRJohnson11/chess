@@ -13,7 +13,7 @@ public class MySqlUserDAO implements UserDAO{
         try{
             configureUserDB();
         } catch (DataAccessException e) {
-            throw new ApiException(500, "failed to make user table");
+            throw new ApiException(500, "Error: failed to make user table");
         }
     }
 
@@ -30,7 +30,7 @@ public class MySqlUserDAO implements UserDAO{
             }
 
         }catch(Exception e){
-            throw new ApiException(500, "there was an error creating the user in the DB");
+            throw new ApiException(500, "Error: there was an error creating the user in the DB");
         }
         return true;
     }
@@ -38,9 +38,9 @@ public class MySqlUserDAO implements UserDAO{
     @Override
     public UserData getUserByUsername(String username) {
         try(var conn = DatabaseManager.getConnection()){
-            var statement = "SELECT * from users where username=?";
+            var statement = "SELECT * from users where username = ?";
             try(var ps = conn.prepareStatement(statement)){
-                ps.setString(1, "username");
+                ps.setString(1, username);
                 try(var rs = ps.executeQuery()){
                     if(rs.next()) {
                         return readUser(rs);
@@ -52,19 +52,19 @@ public class MySqlUserDAO implements UserDAO{
 
             }
         } catch (Exception e) {
-            throw new ApiException(500, "There was an error getting a user by username");
+            throw new ApiException(500, "Error: There was an error getting a user by username");
         }
     }
 
     @Override
     public boolean clear() {
         try(var conn = DatabaseManager.getConnection()){
-            var statement = "TRUNCATE users";
+            var statement = "TRUNCATE TABLE users";
             try( var ps = conn.prepareStatement(statement)){
                 ps.executeUpdate();
             }
         } catch (Exception e) {
-            throw new ApiException(500, "failed to clear users");
+            throw new ApiException(500, "Error: failed to clear users");
         }
         return true;
     }
@@ -94,7 +94,7 @@ public class MySqlUserDAO implements UserDAO{
                 ps.executeUpdate();
             }
         } catch (Exception e) {
-            throw new DataAccessException("failed to create tables");
+            throw new DataAccessException("Error: failed to create tables");
         }
 
 

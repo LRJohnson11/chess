@@ -21,7 +21,7 @@ public class MySqlGameDAO implements GameDAO{
         try {
             configureGamesDB();
         } catch (DataAccessException e) {
-            throw new ApiException(500, "failed to create tables");
+            throw new ApiException(500, "Error: failed to create tables");
         }
     }
     @Override
@@ -38,12 +38,12 @@ public class MySqlGameDAO implements GameDAO{
                 if(rs.next()){
                     return new CreateGameResponse(rs.getInt(1));
                 }
-                throw new ApiException(500, "failed to create a game");
+                throw new ApiException(500, "Error: failed to create a game");
             }
 
 
         } catch (Exception e) {
-            throw new ApiException(500, "error creating game");
+            throw new ApiException(500, "Error: error creating game");
         }
     }
 
@@ -61,7 +61,7 @@ public class MySqlGameDAO implements GameDAO{
             }
 
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new ApiException(500, "Error: failed to list games");
         }
         return new GetGamesResponse(responses);
     }
@@ -69,33 +69,47 @@ public class MySqlGameDAO implements GameDAO{
     @Override
     public GameData getGame(int gameId) {
         try(var conn = DatabaseManager.getConnection()){
-            var statement = "SELECT * from game, where id = ?";
+            var statement = "SELECT * from game where id = ?";
             try(var ps = conn.prepareStatement(statement)){
                 ps.setInt(1, gameId);
                 try(var rs = ps.executeQuery()){
-                    return readGame(rs);
+                    if(rs.next()) {
+                        return readGame(rs);
+                    }
+                    else {
+                        return null;
+                    }
                 }
 
             }
         } catch (Exception e) {
-            throw new ApiException(500, "error getting game by id");
+            throw new ApiException(500, "Error: error getting game by id");
         }
     }
 
     @Override
     public boolean updateGame(int gameId, ChessGame.TeamColor color, String username) {
+        GameData game = getGame(gameId);
+        if(color == ChessGame.TeamColor.BLACK && game.blackUsername() == null){
+            var statement = "UPDATE game set black_username = ? where id = ?";
+            joinGameForColor(statement, username, gameId);
+        }
+        if(color == ChessGame.TeamColor.WHITE && game.whiteUsername() == null){
+            var statement = "UPDATE game set white_username = ? where id = ?";
+            joinGameForColor(statement, username, gameId);
+        }
         return false;
     }
 
     @Override
     public boolean clear() {
-        var statement = "TRUNCATE game";
+        var statement = "TRUNCATE TABLE game";
         try(var conn = DatabaseManager.getConnection()){
             try(var ps = conn.prepareStatement(statement)){
                 ps.executeUpdate();
             }
         } catch (Exception e) {
-            throw new ApiException(500, "error clearing games");
+            throw new ApiException(500, "Error: error clearing games");
         }
 
         return false;
@@ -126,9 +140,21 @@ public class MySqlGameDAO implements GameDAO{
                 ps.executeUpdate();
             }
         } catch (Exception e) {
-            throw new DataAccessException("failed to create tables");
+            throw new DataAccessException("Error: failed to create tables");
         }
-
-
     }
+
+    private void joinGameForColor(String statement, String username, int id){
+        try(var conn = DatabaseManager.getConnection()){
+            try(var ps = conn.prepareStatement(statement)){
+                ps.setString(1,username);
+                ps.setInt(2, id);
+                ps.executeUpdate();
+            }
+        } catch (Exception e) {
+            throw new ApiException(500, "Error: failed to join game for color");
+        }
+    }
+
+
 }

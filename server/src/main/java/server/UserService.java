@@ -36,14 +36,18 @@ public class UserService  {
         if(user == null){
             throw new ApiException(401, "Error: unauthorized");
         }
-        var hashedPassword = user.password();
-        if(!BCrypt.checkpw(request.password(), hashedPassword)){
+        var hashedPasswordFromDb = user.password();
+        if(!BCrypt.checkpw(request.password(), hashedPasswordFromDb)){
             throw new ApiException(401, "Error: unauthorized");
         }
         return authDAO.createAuth(request.username());
     }
 
     public boolean logoutUser(String authToken){
+        AuthData user = authDAO.getAuth(authToken);
+        if(user == null){
+            throw new ApiException(401, "Error: unauthorized");
+        }
         return authDAO.deleteAuth(authToken);
     }
 

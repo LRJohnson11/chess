@@ -115,11 +115,17 @@ public class Server {
             }
         });
         Spark.delete("/db", (req,res) -> {
-            userService.clearUsers();
-            userService.clearAuth();
-            gameService.clearGames();
-            res.type("application/json");
-            return "";
+            try {
+                userService.clearUsers();
+                userService.clearAuth();
+                gameService.clearGames();
+                res.type("application/json");
+                return "";
+            }
+            catch (ApiException e) {
+                res.status(e.getStatus());
+                return gson.toJson(Map.of("message", e.getMessage()));
+            }
         });
         Spark.awaitInitialization();
         return Spark.port();

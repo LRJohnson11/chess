@@ -1,10 +1,8 @@
 package service;
 
-import dataaccess.AuthDAO;
-import dataaccess.LocalAuthDAO;
-import dataaccess.LocalUserDAO;
-import dataaccess.UserDAO;
+import dataaccess.*;
 import model.AuthData;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import server.UserService;
@@ -15,8 +13,8 @@ import server.request.RegisterUserRequest;
 import java.util.Objects;
 
 public class UserServiceTests {
-    UserDAO userDao = new LocalUserDAO();
-    AuthDAO authDao = new LocalAuthDAO();
+    UserDAO userDao = new MySqlUserDAO();
+    AuthDAO authDao = new MySqlAuthDAO();
     UserService userService = new UserService(authDao,userDao);
 
     @Test
@@ -24,8 +22,8 @@ public class UserServiceTests {
     public void registerUserTestSuccessful() {
         RegisterUserRequest request = new RegisterUserRequest("user","pass", "email@email.com");
         AuthData auth = userService.registerUser(request);
-
         assert Objects.equals(request.username(), auth.username());
+
     }
 
     @Test
@@ -40,6 +38,7 @@ public class UserServiceTests {
         } catch (ApiException e){
             assert true;
         }
+
 
     }
 
@@ -146,5 +145,10 @@ public class UserServiceTests {
         AuthData newAuth = userService.registerUser(request);
 
         assert Objects.equals(newAuth.username(), auth.username());
+    }
+    @BeforeEach
+    public void resetDB(){
+        userService.clearUsers();
+        userService.clearAuth();
     }
 }

@@ -69,12 +69,12 @@ public class MySqlAuthDAO implements AuthDAO{
     @Override
     public boolean clear() {
         try(var conn = DatabaseManager.getConnection()){
-            var statement = "TRUNCATE auth";
+            var statement = "TRUNCATE TABLE auth";
             try( var ps = conn.prepareStatement(statement)){
                 ps.executeUpdate();
             }
         } catch (Exception e) {
-            throw new ApiException(500, "failed to update");
+            throw new ApiException(500, "Error: failed to update");
         }
         return true;
     }
@@ -110,7 +110,7 @@ public class MySqlAuthDAO implements AuthDAO{
                 ps.executeUpdate();
             }
         } catch (Exception e) {
-            throw new DataAccessException("failed to create tables");
+            throw new ApiException(500, "Error: failed to create tables");
         }
 
 
