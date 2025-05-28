@@ -18,21 +18,20 @@ public class MySqlUserDAO implements UserDAO{
     }
 
     @Override
-    public boolean createUser(String username, String password, String email) {
+    public boolean createUser(String username, String hashPassword, String email) {
         try(var conn = DatabaseManager.getConnection()){
             var statement = "INSERT into users (username, password, email) VALUES (?,?,?)";
-            var hashPassword = BCrypt.hashpw(password, BCrypt.gensalt());
             try(var ps = conn.prepareStatement(statement)) {
                 ps.setString(1, username);
                 ps.setString(2, hashPassword);
                 ps.setString(3, email);
-                ps.executeUpdate();
+                int rowsAffected = ps.executeUpdate();
+                return rowsAffected > 0;
             }
 
         }catch(Exception e){
             throw new ApiException(500, "Error: there was an error creating the user in the DB");
         }
-        return true;
     }
 
     @Override

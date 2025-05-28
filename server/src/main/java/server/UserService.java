@@ -8,6 +8,8 @@ import org.mindrot.jbcrypt.BCrypt;
 import server.request.LoginRequest;
 import server.request.RegisterUserRequest;
 
+import java.util.UUID;
+
 public class UserService  {
     private final AuthDAO authDAO;
     private final UserDAO userDAO;
@@ -24,8 +26,13 @@ public class UserService  {
         if(userDAO.getUserByUsername(request.username())!= null){
             throw new ApiException(403, "Error: already taken");
         }
-        userDAO.createUser(request.username(),request.password(), request.email());
-        return authDAO.createAuth(request.username());
+        var hashPassword = BCrypt.hashpw(request.password(), BCrypt.gensalt());
+
+        userDAO.createUser(request.username(),hashPassword, request.email());
+        String authToken = generateToken();
+        AuthData auth = new AuthData(request.username(), authToken);
+
+        return authDAO.createAuth(auth);
     }
 
     public AuthData loginUser(LoginRequest request){
@@ -40,7 +47,9 @@ public class UserService  {
         if(!BCrypt.checkpw(request.password(), hashedPasswordFromDb)){
             throw new ApiException(401, "Error: unauthorized");
         }
-        return authDAO.createAuth(request.username());
+        String authToken = generateToken();
+        AuthData auth = new AuthData(request.username(), authToken);
+        return authDAO.createAuth(auth);
     }
 
     public boolean logoutUser(String authToken){
@@ -48,7 +57,7 @@ public class UserService  {
         if(user == null){
             throw new ApiException(401, "Error: unauthorized");
         }
-        return authDAO.deleteAuth(authToken);
+        return authDAO.deleteAuth(user);
     }
 
     public AuthData getAuth(String authToken){
@@ -60,5 +69,9 @@ public class UserService  {
     }
     public void clearUsers(){
         userDAO.clear();
+    }
+
+    private String generateToken() {
+        return UUID.randomUUID().toString();
     }
 }

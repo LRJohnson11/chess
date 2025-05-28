@@ -15,21 +15,20 @@ public class LocalAuthDAO implements AuthDAO{
     }
 
     @Override
-    public AuthData createAuth(String username) {
-        String authToken = generateToken();
-        usernameMap.put(username, new AuthData(username, authToken));
-        tokenMap.put(authToken, new AuthData(username,authToken));
-        return new AuthData(username, authToken);
+    public AuthData createAuth(AuthData auth) {
+        usernameMap.put(auth.username(), new AuthData(auth.username(), auth.authToken()));
+        tokenMap.put(auth.authToken(), new AuthData(auth.username(),auth.authToken()));
+        return auth;
     }
 
     @Override
-    public boolean deleteAuth(String authToken) {
-        AuthData auth = tokenMap.get(authToken);
+    public boolean deleteAuth(AuthData auth) {
+
         if(auth == null){
             throw new ApiException(400, "bad request");
         }
         usernameMap.remove(auth.username());
-        tokenMap.remove(authToken);
+        tokenMap.remove(auth.authToken());
         return true;
     }
 

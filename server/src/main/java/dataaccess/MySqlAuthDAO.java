@@ -17,36 +17,37 @@ public class MySqlAuthDAO implements AuthDAO{
         }
     }
     @Override
-    public AuthData createAuth(String username) {
-        String authToken = generateToken();
+    public AuthData createAuth(AuthData auth) {
+        System.out.println(auth.username() + " logged in!");
         try(var conn = DatabaseManager.getConnection()){
             var statement = "INSERT into auth (username, auth_token) values (?,?)";
             try(var ps = conn.prepareStatement(statement)){
-                ps.setString(1, username);
-                ps.setString(2, authToken);
+                ps.setString(1, auth.username());
+                ps.setString(2, auth.authToken());
                 ps.executeUpdate();
 
             }
         } catch (Exception e) {
             throw new ApiException(500, "We had a DB error");
         }
-        return new AuthData(username,authToken);
+        return auth;
     }
 
     @Override
-    public boolean deleteAuth(String username) {
+    public boolean deleteAuth(AuthData auth) {
+        System.out.println(auth.username() + " logged out!");
 
         try(var conn = DatabaseManager.getConnection()){
-            var statement = "DELETE from auth where username = ?";
+            var statement = "DELETE from auth where auth_token = ?";
             try(var ps = conn.prepareStatement(statement)){
-                ps.setString(1, "username");
-                ps.executeUpdate();
+                ps.setString(1, auth.authToken());
+                int rowsDeleted = ps.executeUpdate();
+                return rowsDeleted != 0;
 
             }
         } catch (Exception e) {
             throw new ApiException(500, "Error deleting auth");
         }
-        return true;
     }
 
     @Override
@@ -79,9 +80,7 @@ public class MySqlAuthDAO implements AuthDAO{
         return true;
     }
 
-    private String generateToken() {
-        return UUID.randomUUID().toString();
-    }
+
 
     private AuthData readAuth(ResultSet rs) throws SQLException {
         if(rs.next()) {
@@ -102,7 +101,7 @@ public class MySqlAuthDAO implements AuthDAO{
                 CREATE TABLE IF NOT EXISTS auth (
                     id INT AUTO_INCREMENT PRIMARY KEY,
                     username VARCHAR(255) NOT NULL,
-                    auth_token VARCHAR(255) NOT NULL
+                    auth_token VARCHAR(255) NOT NULL UNIQUE
                 );
                 """;
         try(var conn = DatabaseManager.getConnection()){
