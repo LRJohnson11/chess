@@ -89,16 +89,15 @@ public class MySqlGameDAO implements GameDAO{
 
     @Override
     public boolean updateGame(int gameId, ChessGame.TeamColor color, String username) {
-        GameData game = getGame(gameId);
-        if(color == ChessGame.TeamColor.BLACK && game.blackUsername() == null){
+        if(color == ChessGame.TeamColor.BLACK){
             var statement = "UPDATE game set black_username = ? where id = ?";
-            joinGameForColor(statement, username, gameId);
+            return joinGameForColor(statement, username, gameId);
         }
-        if(color == ChessGame.TeamColor.WHITE && game.whiteUsername() == null){
+        else {
             var statement = "UPDATE game set white_username = ? where id = ?";
-            joinGameForColor(statement, username, gameId);
+            return joinGameForColor(statement, username, gameId);
         }
-        return false;
+
     }
 
     @Override
@@ -144,12 +143,13 @@ public class MySqlGameDAO implements GameDAO{
         }
     }
 
-    private void joinGameForColor(String statement, String username, int id){
+    private boolean joinGameForColor(String statement, String username, int id){
         try(var conn = DatabaseManager.getConnection()){
             try(var ps = conn.prepareStatement(statement)){
                 ps.setString(1,username);
                 ps.setInt(2, id);
-                ps.executeUpdate();
+                var updatedRows = ps.executeUpdate();
+                return updatedRows != 0;
             }
         } catch (Exception e) {
             throw new ApiException(500, "Error: failed to join game for color");
