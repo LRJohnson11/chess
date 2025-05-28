@@ -27,7 +27,7 @@ public class MySqlGameDAO implements GameDAO{
     @Override
     public CreateGameResponse createGame(String name) {
         try(var conn = DatabaseManager.getConnection()){
-            var statement = "INSERT into game (name, chessGame) values (?,?)";
+            var statement = "INSERT into game (name, chess_game) values (?,?)";
             var game = gson.toJson(new ChessGame());
             try(var ps = conn.prepareStatement(statement, Statement.RETURN_GENERATED_KEYS)) {
                 ps.setString(1,name);
@@ -38,19 +38,32 @@ public class MySqlGameDAO implements GameDAO{
                 if(rs.next()){
                     return new CreateGameResponse(rs.getInt(1));
                 }
-                throw new ApiException(500, "failed to create");
+                throw new ApiException(500, "failed to create a game");
             }
 
 
         } catch (Exception e) {
-            throw new ApiException(500, "We had a DB error");
+            throw new ApiException(500, "error creating game");
         }
     }
 
     @Override
     public GetGamesResponse listGames() {
-        ArrayList<GetGamesResponse> responses = new ArrayList<>();
-        return null;
+        ArrayList<GameData> responses = new ArrayList<>();
+        try(var conn = DatabaseManager.getConnection()){
+            var statement = "SELECT * FROM game";
+            try(var ps = conn.prepareStatement(statement)){
+                try(var rs = ps.executeQuery()){
+                    while(rs.next()) {
+                        responses.add(readGame(rs));
+                    }
+                }
+            }
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return new GetGamesResponse(responses);
     }
 
     @Override
@@ -65,7 +78,7 @@ public class MySqlGameDAO implements GameDAO{
 
             }
         } catch (Exception e) {
-            throw new ApiException(500, "We had a DB error");
+            throw new ApiException(500, "error getting game by id");
         }
     }
 
@@ -82,7 +95,7 @@ public class MySqlGameDAO implements GameDAO{
                 ps.executeUpdate();
             }
         } catch (Exception e) {
-            throw new ApiException(500, "We had a DB error");
+            throw new ApiException(500, "error clearing games");
         }
 
         return false;
@@ -93,7 +106,7 @@ public class MySqlGameDAO implements GameDAO{
         String whiteUsername = rs.getString("white_username");
         String blackUsername = rs.getString("black_username");
         String gameName = rs.getString("name");
-        ChessGame gameBoard = gson.fromJson(rs.getString("game"), ChessGame.class);
+        ChessGame gameBoard = gson.fromJson(rs.getString("chess_game"), ChessGame.class);
         return new GameData(id,whiteUsername,blackUsername,gameName,gameBoard);
     }
 
@@ -102,10 +115,10 @@ public class MySqlGameDAO implements GameDAO{
         var statement = """
                 CREATE TABLE IF NOT EXISTS game (
                     id INT AUTO_INCREMENT PRIMARY KEY,
-                    white_username VARCHAR(255) NOT NULL,
-                    black_username VARCHAR(255) NOT NULL,
+                    white_username VARCHAR(255),
+                    black_username VARCHAR(255),
                     name VARCHAR(255) NOT NULL,
-                    game JSON NOT NULL
+                    chess_game JSON NOT NULL
                 );
                 """;
         try(var conn = DatabaseManager.getConnection()){
