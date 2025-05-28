@@ -30,7 +30,6 @@ public class Server {
     public int run(int desiredPort) {
         Spark.port(desiredPort);
         Spark.staticFiles.location("web");
-
         Spark.post("/user", (req, res) -> {
             try {
                 RegisterUserRequest request = gson.fromJson(req.body(), RegisterUserRequest.class);
@@ -56,9 +55,7 @@ public class Server {
         Spark.delete("/session", (req,res) -> {
             try {
                 String authToken = req.headers("authorization");
-                if(userService.getAuth(authToken) == null){
-                    throw new ApiException(401, "Error: unauthorized");
-                }
+                checkValidAuth(authToken);
                 var result = userService.logoutUser(authToken);
                 res.type("application/json");
                 return "";
@@ -70,9 +67,7 @@ public class Server {
         Spark.get("/game", (req,res) -> {
             try{
             String authToken = req.headers("authorization");
-            if(userService.getAuth(authToken) == null){
-                throw new ApiException(401, "Error: user not logged in");
-            }
+            checkValidAuth(authToken);
             GetGamesResponse games = gameService.listGames();
             res.type("application/json");
             return gson.toJson(games);
@@ -84,10 +79,7 @@ public class Server {
         Spark.post( "/game", (req, res) -> {
             try {
                 String authToken = req.headers("authorization");
-                AuthData user = userService.getAuth(authToken);
-                if (user == null) {
-                    throw new ApiException(401, "Error: unauthenticated");
-                }
+                AuthData user = checkValidAuth(authToken);
                 CreateGameRequest request = gson.fromJson(req.body(), CreateGameRequest.class);
                 CreateGameResponse response = gameService.createGame(request);
                 res.type("application/json");
@@ -100,10 +92,7 @@ public class Server {
         Spark.put("/game", (req,res) -> {
             try{
             String authToken = req.headers("authorization");
-            AuthData user = userService.getAuth(authToken);
-            if(user == null){
-                throw new ApiException(401, "Error: unauthenticated");
-            }
+            AuthData user = checkValidAuth(authToken);
             JoinGameRequest request = gson.fromJson(req.body(), JoinGameRequest.class);
             gameService.joinGame(request, user.username());
             res.status(200);
@@ -116,9 +105,7 @@ public class Server {
         });
         Spark.delete("/db", (req,res) -> {
             try {
-                userService.clearUsers();
-                userService.clearAuth();
-                gameService.clearGames();
+                clearAll();
                 res.type("application/json");
                 return "";
             }
@@ -134,5 +121,17 @@ public class Server {
     public void stop() {
         Spark.stop();
         Spark.awaitStop();
+    }
+    private void clearAll(){
+        userService.clearUsers();
+        userService.clearAuth();
+        gameService.clearGames();
+    }
+    private AuthData checkValidAuth(String authToken){
+        AuthData user = userService.getAuth(authToken);
+        if (user == null){
+            throw new ApiException(401, "Error: unauthenticated");
+        }
+        return user;
     }
 }
