@@ -37,7 +37,7 @@ public class MySqlAuthDAO implements AuthDAO{
     public boolean deleteAuth(String username) {
 
         try(var conn = DatabaseManager.getConnection()){
-            var statement = "DELETE from auth, where username = ?";
+            var statement = "DELETE from auth where username = ?";
             try(var ps = conn.prepareStatement(statement)){
                 ps.setString(1, "username");
                 ps.executeUpdate();
