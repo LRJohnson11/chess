@@ -2,14 +2,14 @@ package ui;
 
 import java.util.Scanner;
 
-import static ui.EscapeSequences.SET_BG_COLOR_DARK_GREY;
-import static ui.EscapeSequences.SET_TEXT_COLOR_BLUE;
+import static ui.EscapeSequences.*;
 
 public class Cli {
     private boolean running = true;
     private String authToken;
     private String response = "";
-    private Scanner scanner = new Scanner(System.in);
+    private final Scanner scanner = new Scanner(System.in);
+
 
 
 
@@ -44,23 +44,31 @@ public class Cli {
     private void loginUser(){
         System.out.println("login user!");
     }
+
+    private void logoutUser() {
+        System.out.println("logout");
+    }
+
+    private void createGame(){
+        System.out.println("create");
+    }
     private void help(){
         if(authToken == null){
             System.out.print(SET_TEXT_COLOR_BLUE + "register <username> <password> <email> ");
-            System.out.println(SET_BG_COLOR_DARK_GREY + "- to create an account");
+            System.out.println(SET_TEXT_COLOR_LIGHT_GREY + "- to create an account");
             System.out.print(SET_TEXT_COLOR_BLUE + "login <username> <password> ");
-            System.out.println(SET_BG_COLOR_DARK_GREY + "- to log in to your account");
+            System.out.println(SET_TEXT_COLOR_LIGHT_GREY + "- to log in to your account");
 
         } else{
             System.out.print(SET_TEXT_COLOR_BLUE + "logout ");
-            System.out.println(SET_BG_COLOR_DARK_GREY + "- log out of account");
+            System.out.println(SET_TEXT_COLOR_LIGHT_GREY + "- log out of account");
             System.out.print(SET_TEXT_COLOR_BLUE + "create <name> ");
-            System.out.println(SET_BG_COLOR_DARK_GREY + "- creates a new chess game");
+            System.out.println(SET_TEXT_COLOR_LIGHT_GREY + "- creates a new chess game");
         }
         System.out.print(SET_TEXT_COLOR_BLUE + "quit ");
-        System.out.println(SET_BG_COLOR_DARK_GREY + "- close the application");
+        System.out.println(SET_TEXT_COLOR_LIGHT_GREY + "- close the application");
         System.out.print(SET_TEXT_COLOR_BLUE + "help ");
-        System.out.println(SET_BG_COLOR_DARK_GREY + "- display available commands");
+        System.out.println(SET_TEXT_COLOR_LIGHT_GREY + "- display available commands");
     }
     private void handeInput(){
         //parse the response value.
