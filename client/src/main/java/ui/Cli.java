@@ -1,5 +1,7 @@
 package ui;
 
+import model.UserData;
+
 import java.util.Scanner;
 
 import static ui.EscapeSequences.*;
@@ -9,6 +11,7 @@ public class Cli {
     private String authToken;
     private String response = "";
     private final Scanner scanner = new Scanner(System.in);
+    private final ServerFacade server = new ServerFacade("http://localhost:2001");
 
 
 
@@ -36,9 +39,14 @@ public class Cli {
         //runs command line interface
     }
 
-    private void registerUser(){
+    private void registerUser(String[] args){
         System.out.print("register user!");
         //calls server endpoint to register a user, response information is propogated
+        if(args.length != 4){
+            throw new RuntimeException("expected 4 arguments, received " + args.length);
+        }
+        server.registerUser(new UserData(args[1], args[2], args[3]));
+
     }
 
     private void loginUser(){
@@ -75,7 +83,7 @@ public class Cli {
         var args = response.split("\\s+");
         var command = args[0];
         switch (command){
-            case "register": registerUser();
+            case "register": registerUser(args);
                 break;
 
             case "login" : loginUser();
