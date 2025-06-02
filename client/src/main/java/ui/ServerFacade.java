@@ -3,6 +3,7 @@ package ui;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import model.AuthData;
 import model.UserData;
 
 import java.io.IOException;
@@ -21,48 +22,67 @@ public class ServerFacade {
         this.address = address;
     }
 
-    public UserData registerUser(UserData user) throws Exception {
+
+    public AuthData registerUser(UserData user) throws Exception {
         //prepare this to post as a new user
         var targetAddress = address + "/user";
 
-        return makeRequest("post", targetAddress, user, UserData.class);
+        return makeRequest("POST", targetAddress, user, AuthData.class);
 
     }
 
+    private String getTargetAddress(String endpoint){
+        return address + "/" + endpoint;
+    }
 
 
     private <T> T makeRequest(String method, String path, Object object, Class<T> responseObject) throws Exception{
         try{
-            URL url = new URI(address).toURL();
+            URL url = new URI(path).toURL();
             HttpURLConnection http = (HttpURLConnection) url.openConnection();
             http.setRequestMethod(method);
             http.setDoOutput(true);
 
             writeBody(object, http);
+            throwIfError(http);
             http.connect();
 
             return readBody(http, responseObject);
 
-        } catch (Exception e){
-            throw new RuntimeException("an unknown error occurred");
+        } catch (ResponseException e){
+            throw new ResponseException(e.getMessage(), e.getStatusCode());
+        }
+
+    }
+
+    private void throwIfError(HttpURLConnection http) throws IOException, ResponseException {
+        var status = http.getResponseCode();
+        if(status != 200){
+            try(InputStream errors = http.getErrorStream()){
+                if(errors != null){
+                    throw ResponseException.fromJson(errors);
+                }
+            } catch (ResponseException e) {
+                throw new ResponseException("other error: " + status, status);
+            }
         }
 
     }
 
     private <T> T readBody(HttpURLConnection http, Class <T> responseClass) throws IOException {
         T response = null;
-        if(http.getContentLength() > 0){
             try(InputStream is = http.getInputStream()){
                 InputStreamReader reader = new InputStreamReader(is);
+                String json = new String(is.readAllBytes());
+                System.out.println(json);
                 if(responseClass != null){
-                    response = gson.fromJson(reader,responseClass);
+                    response = gson.fromJson(json,responseClass);
                 }
             }
-        }
         return response;
     }
 
-    private static void writeBody(Object object, HttpURLConnection http) throws IOException {
+    private void writeBody(Object object, HttpURLConnection http) throws IOException {
         if(object != null){
             http.addRequestProperty("Content-Type", "application/json");
             String jsonBody = gson.toJson(object, object.getClass());
