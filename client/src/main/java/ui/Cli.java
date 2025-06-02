@@ -1,5 +1,6 @@
 package ui;
 
+import model.AuthData;
 import model.UserData;
 
 import java.util.Scanner;
@@ -8,6 +9,7 @@ import static ui.EscapeSequences.*;
 
 public class Cli {
     private boolean running = true;
+    private boolean loggedIn = false;
     private String authToken;
     private String response = "";
     private final Scanner scanner = new Scanner(System.in);
@@ -19,11 +21,11 @@ public class Cli {
     public void run(){
         System.out.println("Welcome to 240 chess! login or register to play, or type help for command information");
         while(running){
-            if(authToken == null){
-                System.out.print("LOGGED OUT");
+            if(loggedIn){
+                System.out.print("LOGGED IN");
             }
             else{
-                System.out.print("LOGGED IN");
+                System.out.print("LOGGED OUT");
             }
             System.out.print(" >>>");
             response = scanner.nextLine().trim();
@@ -45,7 +47,15 @@ public class Cli {
         if(args.length != 4){
             throw new RuntimeException("expected 4 arguments, received " + args.length);
         }
-        server.registerUser(new UserData(args[1], args[2], args[3]));
+        try {
+            AuthData auth = server.registerUser(new UserData(args[1], args[2], args[3]));
+            if(auth.valid()){
+                authToken = auth.authToken();
+                loggedIn = true;
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage());
+        }
 
     }
 
@@ -61,7 +71,8 @@ public class Cli {
         System.out.println("create");
     }
     private void help(){
-        if(authToken == null){
+        //fixme this has backwards login logic
+        if(loggedIn){
             System.out.print(SET_TEXT_COLOR_BLUE + "register <username> <password> <email> ");
             System.out.println(SET_TEXT_COLOR_LIGHT_GREY + "- to create an account");
             System.out.print(SET_TEXT_COLOR_BLUE + "login <username> <password> ");
