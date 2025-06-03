@@ -1,8 +1,11 @@
 package ui;
 
 import model.AuthData;
+import model.GameData;
 import model.UserData;
 import requests.LoginRequest;
+import response.CreateGameResponse;
+import response.ListGamesResponse;
 
 import java.util.Scanner;
 
@@ -92,13 +95,25 @@ public class Cli {
         }
         System.out.println("create");
         try {
-            server.createGame(authToken, args[1]);
+            CreateGameResponse res = server.createGame(authToken, args[1]);
+            System.out.println("created a new game: "  + args[1] + " id: " + res.gameId() + ".");
         }
         catch (Exception e){
             throw new RuntimeException(e.getMessage());
         }
     }
     private void listGames() {
+        try{
+            ListGamesResponse res = server.listGames(authToken);
+            System.out.println("games:");
+            for(GameData game : res.games()){
+                System.out.println("name: " + game.gameName());
+            }
+
+
+        } catch (Exception e){
+            throw new RuntimeException(e.getMessage());
+        }
     }
     private void joinGame(String[] args) {
     }
@@ -117,7 +132,7 @@ public class Cli {
             System.out.println(SET_TEXT_COLOR_LIGHT_GREY + "- creates a new chess game");
             System.out.print(SET_TEXT_COLOR_BLUE + "list ");
             System.out.println(SET_TEXT_COLOR_LIGHT_GREY + "- all games found on server");
-            System.out.print(SET_TEXT_COLOR_BLUE + "join <game id> ");
+            System.out.print(SET_TEXT_COLOR_BLUE + "join <game id> <White/Black>");
             System.out.println(SET_TEXT_COLOR_LIGHT_GREY + "- a game");
             System.out.print(SET_TEXT_COLOR_BLUE + "observe <game id> ");
             System.out.println(SET_TEXT_COLOR_LIGHT_GREY + "- a game");
@@ -132,7 +147,7 @@ public class Cli {
     }
     private void handeInput(){
         //parse the response value.
-        var args = response.split("\\s+");
+        var args = response.toLowerCase().split("\\s+");
         var command = args[0];
         switch (command){
             case "register": registerUser(args);
