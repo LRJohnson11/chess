@@ -20,7 +20,7 @@ public class Cli {
 
 
     public void run(){
-        System.out.println("Welcome to 240 chess! login or register to play, or type help for command information");
+        System.out.println(SET_TEXT_COLOR_WHITE + "Welcome to 240 chess! login or register to play, or type help for command information");
         while(running){
             if(loggedIn){
                 System.out.print("LOGGED IN");
@@ -76,7 +76,13 @@ public class Cli {
     }
 
     private void logoutUser() {
-        System.out.println("logout");
+        try{
+            server.logoutUser(authToken);
+            authToken = null;
+            loggedIn = false;
+        } catch (Exception e){
+            throw new RuntimeException(e.getMessage());
+        }
 
     }
 

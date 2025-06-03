@@ -14,6 +14,9 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
+import java.text.ParseException;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ServerFacade {
     static Gson gson = new GsonBuilder().serializeNulls().create();
@@ -28,15 +31,16 @@ public class ServerFacade {
         //prepare this to post as a new user
         var targetAddress = address + "/user";
 
-        return makeRequest("POST", targetAddress, user, AuthData.class);
+        return makeRequest("POST", targetAddress, user, AuthData.class, null);
 
     }
     public AuthData loginUser(LoginRequest loginRequest) throws Exception {
-        return makeRequest("POST", getTargetAddress("session"), loginRequest, AuthData.class);
+        return makeRequest("POST", getTargetAddress("session"), loginRequest, AuthData.class, null);
     }
 
-    public void logoutUser() throws Exception {
-        makeRequest("DELETE", getTargetAddress("session"), null, null);
+    public void logoutUser(String authToken) throws Exception {
+        Map<String, String> headers = Map.of("Authorization", authToken);
+        makeRequest("DELETE", getTargetAddress("session"), null, null, headers);
     }
 
     private String getTargetAddress(String endpoint){
@@ -44,12 +48,17 @@ public class ServerFacade {
     }
 
 
-    private <T> T makeRequest(String method, String path, Object object, Class<T> responseObject) throws Exception{
+    private <T> T makeRequest(String method, String path, Object object, Class<T> responseObject, Map<String,String> headers) throws Exception{
         try{
             URL url = new URI(path).toURL();
             HttpURLConnection http = (HttpURLConnection) url.openConnection();
             http.setRequestMethod(method);
             http.setDoOutput(true);
+            if(headers != null){
+                for(var header: headers.entrySet()){
+                    http.addRequestProperty(header.getKey(), header.getValue());
+                }
+            }
 
             writeBody(object, http);
             throwIfError(http);
@@ -71,7 +80,9 @@ public class ServerFacade {
                     throw ResponseException.fromJson(errors);
                 }
             } catch (ResponseException e) {
-                throw new ResponseException("other error: " + e.getMessage(), status);
+                throw e;
+            } catch (Exception e){
+                throw new ResponseException("internal server error", 500);
             }
         }
 
