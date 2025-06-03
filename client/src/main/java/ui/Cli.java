@@ -43,7 +43,6 @@ public class Cli {
     }
 
     private void registerUser(String[] args){
-        System.out.print("register user!");
         //calls server endpoint to register a user, response information is propogated
         if(args.length != 4){
             throw new RuntimeException("expected 4 arguments, received " + args.length);
@@ -66,6 +65,10 @@ public class Cli {
         }
         try{
             AuthData auth = server.loginUser(new LoginRequest(args[1], args[2]));
+            if(auth.valid()){
+                authToken = auth.authToken();
+                loggedIn = true;
+            }
 
         } catch (Exception e){
             throw new RuntimeException(e.getMessage());
@@ -74,6 +77,7 @@ public class Cli {
 
     private void logoutUser() {
         System.out.println("logout");
+
     }
 
     private void createGame(){

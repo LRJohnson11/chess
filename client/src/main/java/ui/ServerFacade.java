@@ -5,6 +5,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import model.AuthData;
 import model.UserData;
+import requests.LoginRequest;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,6 +30,13 @@ public class ServerFacade {
 
         return makeRequest("POST", targetAddress, user, AuthData.class);
 
+    }
+    public AuthData loginUser(LoginRequest loginRequest) throws Exception {
+        return makeRequest("POST", getTargetAddress("session"), loginRequest, AuthData.class);
+    }
+
+    public void logoutUser() throws Exception {
+        makeRequest("DELETE", getTargetAddress("session"), null, null);
     }
 
     private String getTargetAddress(String endpoint){
@@ -63,7 +71,7 @@ public class ServerFacade {
                     throw ResponseException.fromJson(errors);
                 }
             } catch (ResponseException e) {
-                throw new ResponseException("other error: " + status, status);
+                throw new ResponseException("other error: " + e.getMessage(), status);
             }
         }
 
