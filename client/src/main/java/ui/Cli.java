@@ -98,6 +98,12 @@ public class Cli {
             throw new RuntimeException(e.getMessage());
         }
     }
+    private void listGames() {
+    }
+    private void joinGame(String[] args) {
+    }
+    private void observeGame(String[] args) {
+    }
 
     private void help(){
         if(!loggedIn){
@@ -147,6 +153,7 @@ public class Cli {
             case "observer": observeGame(args);
 
             case "quit" : running = false;
+                logoutUser();
                 break;
 
             case "help" : help();
