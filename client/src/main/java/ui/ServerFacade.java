@@ -5,7 +5,9 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import model.AuthData;
 import model.UserData;
+import requests.CreateGameRequest;
 import requests.LoginRequest;
+import response.CreateGameResponse;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -41,6 +43,10 @@ public class ServerFacade {
     public void logoutUser(String authToken) throws Exception {
         Map<String, String> headers = Map.of("Authorization", authToken);
         makeRequest("DELETE", getTargetAddress("session"), null, null, headers);
+    }
+    public void createGame(String authToken, String arg) throws Exception {
+        Map<String,String> headers = Map.of("Authorization", authToken);
+        makeRequest("POST", getTargetAddress("game"), new CreateGameRequest(arg), CreateGameResponse.class, headers);
     }
 
     private String getTargetAddress(String endpoint){
@@ -110,5 +116,6 @@ public class ServerFacade {
             }
         }
     }
+
 
 }

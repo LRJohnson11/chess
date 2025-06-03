@@ -86,11 +86,20 @@ public class Cli {
 
     }
 
-    private void createGame(){
+    private void createGame(String[] args){
+        if(args.length !=2){
+            throw new RuntimeException("Expected 2 arguments, received " + args.length);
+        }
         System.out.println("create");
+        try {
+            server.createGame(authToken, args[1]);
+        }
+        catch (Exception e){
+            throw new RuntimeException(e.getMessage());
+        }
     }
+
     private void help(){
-        //fixme this has backwards login logic
         if(!loggedIn){
             System.out.print(SET_TEXT_COLOR_BLUE + "register <username> <password> <email> ");
             System.out.println(SET_TEXT_COLOR_LIGHT_GREY + "- to create an account");
@@ -120,7 +129,7 @@ public class Cli {
                 break;
 
             case "logout": logoutUser();
-            break;
+                break;
 
             case "create" : createGame();
 
