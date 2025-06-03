@@ -2,6 +2,7 @@ package ui;
 
 import model.AuthData;
 import model.UserData;
+import requests.LoginRequest;
 
 import java.util.Scanner;
 
@@ -59,8 +60,16 @@ public class Cli {
 
     }
 
-    private void loginUser(){
-        System.out.println("login user!");
+    private void loginUser(String[] args){
+        if(args.length !=3){
+            throw new RuntimeException("expected 3 arguments, received " + args.length);
+        }
+        try{
+            AuthData auth = server.loginUser(new LoginRequest(args[1], args[2]));
+
+        } catch (Exception e){
+            throw new RuntimeException(e.getMessage());
+        }
     }
 
     private void logoutUser() {
@@ -72,7 +81,7 @@ public class Cli {
     }
     private void help(){
         //fixme this has backwards login logic
-        if(loggedIn){
+        if(!loggedIn){
             System.out.print(SET_TEXT_COLOR_BLUE + "register <username> <password> <email> ");
             System.out.println(SET_TEXT_COLOR_LIGHT_GREY + "- to create an account");
             System.out.print(SET_TEXT_COLOR_BLUE + "login <username> <password> ");
@@ -97,7 +106,7 @@ public class Cli {
             case "register": registerUser(args);
                 break;
 
-            case "login" : loginUser();
+            case "login" : loginUser(args);
                 break;
 
             case "logout": logoutUser();
