@@ -5,6 +5,7 @@ import com.google.gson.stream.JsonReader;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,10 +29,19 @@ public class ResponseException extends Exception{
         return new Gson().toJson(Map.of("message", getMessage(), "status", statusCode));
     }
 
-    public static ResponseException fromJson(InputStream stream) {
+    public static ResponseException fromJson(InputStream stream) throws ParseException {
         var map = new Gson().fromJson(new InputStreamReader(stream), HashMap.class);
-        var status = ((Double)map.get("status")).intValue();
-        String message = map.get("message").toString();
+
+        int status = 500;
+        var maybeStatus = map.get("status");
+        if(maybeStatus instanceof Number){
+            status = ((Number) maybeStatus).intValue();
+        }
+        String message = "unknown error";
+        var maybeMessage = map.get("message");
+        if(maybeMessage instanceof String) {
+            message = maybeMessage.toString();
+        }
         return new ResponseException(message,status);
     }
 
