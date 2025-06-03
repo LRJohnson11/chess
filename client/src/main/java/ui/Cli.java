@@ -23,10 +23,10 @@ public class Cli {
         System.out.println(SET_TEXT_COLOR_WHITE + "Welcome to 240 chess! login or register to play, or type help for command information");
         while(running){
             if(loggedIn){
-                System.out.print("LOGGED IN");
+                System.out.print(SET_TEXT_COLOR_WHITE + "LOGGED IN");
             }
             else{
-                System.out.print("LOGGED OUT");
+                System.out.print(SET_TEXT_COLOR_WHITE + "LOGGED OUT");
             }
             System.out.print(" >>>");
             response = scanner.nextLine().trim();
@@ -35,7 +35,7 @@ public class Cli {
                 try {
                     handeInput();
                 }catch (Throwable e){
-                    System.out.println(e.getMessage());
+                    System.out.println(SET_TEXT_COLOR_RED + e.getMessage());
                 }
             }
         }
@@ -107,10 +107,17 @@ public class Cli {
             System.out.println(SET_TEXT_COLOR_LIGHT_GREY + "- to log in to your account");
 
         } else{
-            System.out.print(SET_TEXT_COLOR_BLUE + "logout ");
-            System.out.println(SET_TEXT_COLOR_LIGHT_GREY + "- log out of account");
             System.out.print(SET_TEXT_COLOR_BLUE + "create <name> ");
             System.out.println(SET_TEXT_COLOR_LIGHT_GREY + "- creates a new chess game");
+            System.out.print(SET_TEXT_COLOR_BLUE + "list ");
+            System.out.println(SET_TEXT_COLOR_LIGHT_GREY + "- all games found on server");
+            System.out.print(SET_TEXT_COLOR_BLUE + "join <game id> ");
+            System.out.println(SET_TEXT_COLOR_LIGHT_GREY + "- a game");
+            System.out.print(SET_TEXT_COLOR_BLUE + "observe <game id> ");
+            System.out.println(SET_TEXT_COLOR_LIGHT_GREY + "- a game");
+            System.out.print(SET_TEXT_COLOR_BLUE + "logout ");
+            System.out.println(SET_TEXT_COLOR_LIGHT_GREY + "- log out of account");
+
         }
         System.out.print(SET_TEXT_COLOR_BLUE + "quit ");
         System.out.println(SET_TEXT_COLOR_LIGHT_GREY + "- close the application");
@@ -131,7 +138,13 @@ public class Cli {
             case "logout": logoutUser();
                 break;
 
-            case "create" : createGame();
+            case "create" : createGame(args);
+                break;
+            case "list" : listGames();
+            break;
+            case "join" : joinGame(args);
+            break;
+            case "observer": observeGame(args);
 
             case "quit" : running = false;
                 break;
