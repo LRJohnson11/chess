@@ -7,6 +7,8 @@ import requests.LoginRequest;
 import response.CreateGameResponse;
 import response.ListGamesResponse;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
 
 import static ui.EscapeSequences.*;
@@ -18,6 +20,7 @@ public class Cli {
     private String response = "";
     private final Scanner scanner = new Scanner(System.in);
     private final ServerFacade server = new ServerFacade("http://localhost:2001");
+    private Map<Integer, Integer> games = new HashMap<>();
 
 
 
@@ -110,7 +113,11 @@ public class Cli {
             ListGamesResponse res = server.listGames(authToken);
             System.out.println("games:");
             for(GameData game : res.games()){
-                System.out.println("name: " + game.gameName());
+                games.put(res.games().indexOf(game) + 1, game.gameID());
+                System.out.print(SET_TEXT_COLOR_GREEN + (res.games().indexOf(game) + 1));
+                System.out.print( "> game: " + game.gameName() + " ");
+                System.out.print(" White user: " + (game.whiteUsername() != null ? game.whiteUsername(): "none"));
+                System.out.println(" Black user: " + (game.whiteUsername() != null ? game.blackUsername(): "none"));
             }
 
 
