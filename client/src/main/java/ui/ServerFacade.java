@@ -1,11 +1,13 @@
 package ui;
 
 
+import chess.ChessGame;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import model.AuthData;
 import model.UserData;
 import requests.CreateGameRequest;
+import requests.JoinGameRequest;
 import requests.LoginRequest;
 import response.CreateGameResponse;
 import response.ListGamesResponse;
@@ -45,13 +47,31 @@ public class ServerFacade {
         Map<String, String> headers = Map.of("Authorization", authToken);
         makeRequest("DELETE", getTargetAddress("session"), null, null, headers);
     }
+
     public CreateGameResponse createGame(String authToken, String arg) throws Exception {
         Map<String,String> headers = Map.of("Authorization", authToken);
         return makeRequest("POST", getTargetAddress("game"), new CreateGameRequest(arg), CreateGameResponse.class, headers);
     }
+
     public ListGamesResponse listGames(String authToken) throws Exception {
         Map<String,String> headers = Map.of("Authorization", authToken);
         return makeRequest("GET", getTargetAddress("game"), null, ListGamesResponse.class, headers);
+    }
+
+    public void joinGame(String authToken, String[] args) throws Exception {
+        Map <String, String> headers = Map.of("Authorization", authToken);
+        int gameID = Integer.parseInt(args[1]);
+        ChessGame.TeamColor color = null;
+        if(args[2].equalsIgnoreCase("white")){
+            color = ChessGame.TeamColor.WHITE;
+        }
+        if(args[2].equalsIgnoreCase("black")){
+            color = ChessGame.TeamColor.BLACK;
+        }
+        if(color == null){
+            throw new ResponseException("color must be 'white' or 'black'", 500);
+        }
+        makeRequest("PUT", getTargetAddress("game"), new JoinGameRequest(color, gameID), null, headers);
     }
 
     private String getTargetAddress(String endpoint){
@@ -121,6 +141,7 @@ public class ServerFacade {
             }
         }
     }
+
 
 
 }

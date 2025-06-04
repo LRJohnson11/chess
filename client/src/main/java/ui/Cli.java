@@ -79,6 +79,7 @@ public class Cli {
     }
 
     private void logoutUser() {
+        authorizedOrThrow();
         try{
             server.logoutUser(authToken);
             authToken = null;
@@ -90,19 +91,21 @@ public class Cli {
     }
 
     private void createGame(String[] args){
+        authorizedOrThrow();
         if(args.length !=2){
             throw new RuntimeException("Expected 2 arguments, received " + args.length);
         }
-        System.out.println("create");
         try {
             CreateGameResponse res = server.createGame(authToken, args[1]);
-            System.out.println("created a new game: "  + args[1] + " id: " + res.gameId() + ".");
+            System.out.println("created a new game: "  + args[1] + " id: " + res.gameID() + ".");
         }
         catch (Exception e){
             throw new RuntimeException(e.getMessage());
         }
     }
     private void listGames() {
+        authorizedOrThrow();
+
         try{
             ListGamesResponse res = server.listGames(authToken);
             System.out.println("games:");
@@ -116,8 +119,17 @@ public class Cli {
         }
     }
     private void joinGame(String[] args) {
+        authorizedOrThrow();
+        try{
+            server.joinGame(authToken, args);
+        } catch (Exception e){
+            throw new RuntimeException(e.getMessage());
+        }
     }
+
     private void observeGame(String[] args) {
+        authorizedOrThrow();
+
     }
 
     private void help(){
@@ -163,9 +175,12 @@ public class Cli {
                 break;
             case "list" : listGames();
             break;
+
             case "join" : joinGame(args);
             break;
-            case "observer": observeGame(args);
+
+            case "observe": observeGame(args);
+            break;
 
             case "quit" : running = false;
                 logoutUser();
@@ -177,6 +192,12 @@ public class Cli {
             default:
                 throw new RuntimeException("invalid command");
 
+        }
+    }
+
+    private void authorizedOrThrow(){
+        if(authToken == null){
+            throw new RuntimeException("Unauthorized. Please log in");
         }
     }
 }
