@@ -58,19 +58,9 @@ public class ServerFacade {
         return makeRequest("GET", getTargetAddress("game"), null, ListGamesResponse.class, headers);
     }
 
-    public void joinGame(String authToken, String[] args) throws Exception {
+    public void joinGame(String authToken, int gameID, ChessGame.TeamColor color) throws Exception {
         Map <String, String> headers = Map.of("Authorization", authToken);
-        int gameID = Integer.parseInt(args[1]);
-        ChessGame.TeamColor color = null;
-        if(args[2].equalsIgnoreCase("white")){
-            color = ChessGame.TeamColor.WHITE;
-        }
-        if(args[2].equalsIgnoreCase("black")){
-            color = ChessGame.TeamColor.BLACK;
-        }
-        if(color == null){
-            throw new ResponseException("color must be 'white' or 'black'", 500);
-        }
+
         makeRequest("PUT", getTargetAddress("game"), new JoinGameRequest(color, gameID), null, headers);
     }
 

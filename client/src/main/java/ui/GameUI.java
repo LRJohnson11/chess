@@ -1,0 +1,100 @@
+package ui;
+
+import chess.ChessGame;
+import chess.ChessPiece;
+import chess.ChessPosition;
+
+import static ui.EscapeSequences.*;
+
+public class GameUI {
+    ChessGame game;
+    ChessGame.TeamColor clientColor;
+    private String[] columnLabels = {"   ", " a ", " b ", " c ", " d ", " e ", " f ", " g ", " h ", "   "};
+    private String[] rowLabels =    {"", " 8 ", " 7 ", " 6 ", " 5 ", " 4 ", " 3 ", " 2 ", " 1 ", ""};
+    public GameUI(ChessGame game, ChessGame.TeamColor color){
+        this.game = game;
+        this.clientColor = color;
+    }
+
+
+    public void run(){
+        if(clientColor == ChessGame.TeamColor.WHITE) {
+            drawGameBoardWhite();
+        }else {
+            drawGameBoardBlack();
+        }
+    }
+
+    private void drawGameBoardBlack() {
+        for(int i = 9; i >= 0; i--){
+            for(int j = 9; j >= 0; j--){
+                //border code
+                if( i == 0 || i == 9 || j == 0 || j == 9){
+                    System.out.print(SET_BG_COLOR_DARK_GREY);
+                    System.out.print(SET_TEXT_COLOR_WHITE);
+                    if(i ==0 || i == 9){
+                        System.out.print(columnLabels[j]);
+                    }
+                    if(j == 0 || j == 9){
+                        System.out.print(rowLabels[i] + (j == 9 ? "\n": ""));
+                    }
+                } else if( i % 2  == j % 2) {
+                    System.out.print(SET_BG_COLOR_LIGHT_GREY);
+                    printBoardPiece(i,j);
+                } else{
+                    System.out.print(SET_BG_COLOR_BLACK);
+                    printBoardPiece(i,j);
+                }
+            }
+        }
+    }
+
+
+    private void drawGameBoardWhite() {
+        for(int i = 0; i < 10; i++){
+            for(int j = 0; j < 10; j++){
+                //border code
+                if( i == 0 || i == 9 || j == 0 || j == 9){
+                    System.out.print(SET_BG_COLOR_DARK_GREY);
+                    System.out.print(SET_TEXT_COLOR_WHITE);
+                    if(i ==0 || i == 9){
+                        System.out.print(columnLabels[j]);
+                    }
+                    if(j == 0 || j == 9){
+                        System.out.print(rowLabels[i] + (j == 9 ? "\n": ""));
+                    }
+                } else if( i % 2  == j % 2) {
+                    System.out.print(SET_BG_COLOR_LIGHT_GREY);
+                    printBoardPiece(i,j);
+                } else{
+                        System.out.print(SET_BG_COLOR_BLACK);
+                        printBoardPiece(i,j);
+                    }
+            }
+        }
+    }
+
+    private void printBoardPiece(int i, int j) {
+        if(game.getBoard().getPiece(new ChessPosition(i,j)) == null){
+            System.out.print("   ");
+            return;
+        }
+        ChessPiece piece = game.getBoard().getPiece(new ChessPosition(i,j));
+        ChessGame.TeamColor pieceColor = piece.getTeamColor();
+        if(pieceColor == ChessGame.TeamColor.BLACK){
+            System.out.print(SET_TEXT_COLOR_BLUE);
+        } else {
+            System.out.print(SET_TEXT_COLOR_YELLOW);
+        }
+        ChessPiece.PieceType type = piece.getPieceType();
+
+        switch (type){
+            case KING -> System.out.print(" K ");
+            case QUEEN -> System.out.print(" Q ");
+            case BISHOP -> System.out.print(" B ");
+            case KNIGHT -> System.out.print(" N ");
+            case ROOK -> System.out.print(" R ");
+            case PAWN -> System.out.print(" P ");
+        }
+    }
+}

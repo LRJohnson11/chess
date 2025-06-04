@@ -1,5 +1,6 @@
 package ui;
 
+import chess.ChessGame;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
@@ -20,7 +21,7 @@ public class Cli {
     private String response = "";
     private final Scanner scanner = new Scanner(System.in);
     private final ServerFacade server = new ServerFacade("http://localhost:2001");
-    private Map<Integer, Integer> games = new HashMap<>();
+    private Map<Integer, GameData> games = new HashMap<>();
 
 
 
@@ -113,7 +114,7 @@ public class Cli {
             ListGamesResponse res = server.listGames(authToken);
             System.out.println("games:");
             for(GameData game : res.games()){
-                games.put(res.games().indexOf(game) + 1, game.gameID());
+                games.put(res.games().indexOf(game) + 1, game);
                 System.out.print(SET_TEXT_COLOR_GREEN + (res.games().indexOf(game) + 1));
                 System.out.print( "> game: " + game.gameName() + " ");
                 System.out.print(" White user: " + (game.whiteUsername() != null ? game.whiteUsername(): "none"));
@@ -125,10 +126,25 @@ public class Cli {
             throw new RuntimeException(e.getMessage());
         }
     }
-    private void joinGame(String[] args) {
+    private void joinGame(String[] args)  {
         authorizedOrThrow();
+        if(games.isEmpty()){
+            throw new RuntimeException("no games to join. run 'list' to find games");
+        }
+        int gameID = games.get(Integer.parseInt(args[1])).gameID();
+        ChessGame.TeamColor color = null;
+        if(args[2].equalsIgnoreCase("white")){
+            color = ChessGame.TeamColor.WHITE;
+        }
+        if(args[2].equalsIgnoreCase("black")){
+            color = ChessGame.TeamColor.BLACK;
+        }
+        if(color == null){
+            throw new RuntimeException("color must be 'white' or 'black'");
+        }
         try{
-            server.joinGame(authToken, args);
+            server.joinGame(authToken, gameID,color);
+            new GameUI(games.get(Integer.parseInt(args[1])).game(), color).run();
         } catch (Exception e){
             throw new RuntimeException(e.getMessage());
         }
@@ -136,6 +152,11 @@ public class Cli {
 
     private void observeGame(String[] args) {
         authorizedOrThrow();
+        try {
+            new GameUI(games.get(Integer.parseInt(args[1])).game(), ChessGame.TeamColor.WHITE).run();
+        } catch (Exception e){
+            throw new RuntimeException(e.getMessage());
+        }
 
     }
 
