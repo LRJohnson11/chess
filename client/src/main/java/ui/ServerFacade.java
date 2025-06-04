@@ -114,7 +114,6 @@ public class ServerFacade {
             try(InputStream is = http.getInputStream()){
                 InputStreamReader reader = new InputStreamReader(is);
                 String json = new String(is.readAllBytes());
-                System.out.println(json);
                 if(responseClass != null){
                     response = gson.fromJson(json,responseClass);
                 }

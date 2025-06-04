@@ -9,8 +9,8 @@ import static ui.EscapeSequences.*;
 public class GameUI {
     ChessGame game;
     ChessGame.TeamColor clientColor;
-    private String[] columnLabels = {"   ", " a ", " b ", " c ", " d ", " e ", " f ", " g ", " h ", "   "};
-    private String[] rowLabels =    {"", " 8 ", " 7 ", " 6 ", " 5 ", " 4 ", " 3 ", " 2 ", " 1 ", ""};
+    private String[] columnLabels = {"   ", " h ", " g ", " f ", " e ", " d ", " c ", " b ", " a ", "   "};
+    private String[] rowLabels =    {"", " 1 ", " 2 ", " 3 ", " 4 ", " 5 ", " 6 ", " 7 ", " 8 ", ""};
     public GameUI(ChessGame game, ChessGame.TeamColor color){
         this.game = game;
         this.clientColor = color;
@@ -25,7 +25,7 @@ public class GameUI {
         }
     }
 
-    private void drawGameBoardBlack() {
+    private void drawGameBoardWhite() {
         for(int i = 9; i >= 0; i--){
             for(int j = 9; j >= 0; j--){
                 //border code
@@ -36,7 +36,7 @@ public class GameUI {
                         System.out.print(columnLabels[j]);
                     }
                     if(j == 0 || j == 9){
-                        System.out.print(rowLabels[i] + (j == 9 ? "\n": ""));
+                        System.out.print(rowLabels[i] + (j == 0 ? "\n": ""));
                     }
                 } else if( i % 2  == j % 2) {
                     System.out.print(SET_BG_COLOR_LIGHT_GREY);
@@ -50,7 +50,7 @@ public class GameUI {
     }
 
 
-    private void drawGameBoardWhite() {
+    private void drawGameBoardBlack() {
         for(int i = 0; i < 10; i++){
             for(int j = 0; j < 10; j++){
                 //border code
