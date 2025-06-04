@@ -63,6 +63,9 @@ public class ServerFacade {
 
         makeRequest("PUT", getTargetAddress("game"), new JoinGameRequest(color, gameID), null, headers);
     }
+    public void clearDB() throws Exception {
+        makeRequest("DELETE", getTargetAddress("db"), null,null,null);
+    }
 
     private String getTargetAddress(String endpoint){
         return address + "/" + endpoint;
