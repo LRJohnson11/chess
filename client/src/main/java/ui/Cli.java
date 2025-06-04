@@ -117,7 +117,7 @@ public class Cli {
                 System.out.print(SET_TEXT_COLOR_GREEN + (res.games().indexOf(game) + 1));
                 System.out.print( "> game: " + game.gameName() + " ");
                 System.out.print(" White user: " + (game.whiteUsername() != null ? game.whiteUsername(): "none"));
-                System.out.println(" Black user: " + (game.whiteUsername() != null ? game.blackUsername(): "none"));
+                System.out.println(" Black user: " + (game.blackUsername() != null ? game.blackUsername(): "none"));
             }
 
 
