@@ -131,6 +131,12 @@ public class Cli {
         if(games.isEmpty()){
             throw new RuntimeException("no games to join. run 'list' to find games");
         }
+        if(args.length < 3){
+            throw new RuntimeException("expected 3 arguments, received " + args.length);
+        }
+        if(!games.containsKey(Integer.parseInt(args[1]))){
+            throw new RuntimeException("game not found. run 'list' to find games");
+        }
         int gameID = games.get(Integer.parseInt(args[1])).gameID();
         ChessGame.TeamColor color = null;
         if(args[2].equalsIgnoreCase("white")){
@@ -153,7 +159,14 @@ public class Cli {
     private void observeGame(String[] args) {
         authorizedOrThrow();
         try {
-            new GameUI(games.get(Integer.parseInt(args[1])).game(), ChessGame.TeamColor.WHITE).run();
+            //add validation that gameId exists
+            var gameId = Integer.parseInt(args[1]);
+            if(games.containsKey(gameId)) {
+                new GameUI(games.get(Integer.parseInt(args[1])).game(), ChessGame.TeamColor.WHITE).run();
+            }
+            else{
+                throw new RuntimeException("game not found. run 'list' to find available games.");
+            }
         } catch (Exception e){
             throw new RuntimeException(e.getMessage());
         }

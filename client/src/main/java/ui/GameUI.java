@@ -75,11 +75,11 @@ public class GameUI {
     }
 
     private void printBoardPiece(int i, int j) {
-        if(game.getBoard().getPiece(new ChessPosition(i,j)) == null){
+        if(game.getBoard().getPiece(new ChessPosition(i, 9 -j)) == null){
             System.out.print("   ");
             return;
         }
-        ChessPiece piece = game.getBoard().getPiece(new ChessPosition(i,j));
+        ChessPiece piece = game.getBoard().getPiece(new ChessPosition(i,9 - j));
         ChessGame.TeamColor pieceColor = piece.getTeamColor();
         if(pieceColor == ChessGame.TeamColor.BLACK){
             System.out.print(SET_TEXT_COLOR_BLUE);
