@@ -10,6 +10,7 @@ import server.request.LoginRequest;
 import server.request.RegisterUserRequest;
 import server.response.CreateGameResponse;
 import server.response.GetGamesResponse;
+import server.websocket.WebSocketHandler;
 import spark.*;
 
 import java.util.Map;
@@ -22,6 +23,8 @@ public class Server {
     private final GameDAO gameDAO = new MySqlGameDAO();
     private final UserService userService = new UserService(authDAO, userDAO);
     private final GameService gameService = new GameService(gameDAO);
+    private final WebSocketHandler webSocketHandler = new WebSocketHandler();
+
 
 
     public Server() {
@@ -30,6 +33,7 @@ public class Server {
     public int run(int desiredPort) {
         Spark.port(desiredPort);
         Spark.staticFiles.location("web");
+        Spark.webSocket("/ws", webSocketHandler);
         Spark.post("/user", (req, res) -> {
             try {
                 RegisterUserRequest request = gson.fromJson(req.body(), RegisterUserRequest.class);
