@@ -10,6 +10,8 @@ import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import server.GameService;
 import server.UserService;
+import websocket.commands.MakeMoveCommand;
+import websocket.commands.UserGameCommand;
 
 import java.io.IOException;
 
@@ -37,12 +39,12 @@ public class WebSocketHandler {
             // Peek at commandType to determine exact command class
             UserGameCommand base = gson.fromJson(message, UserGameCommand.class);
 
-            if (base.commandType == null) {
+            if (base.getCommandType() == null) {
                 System.out.println("ws: command was null");
                 return;
             }
 
-            switch (base.commandType) {
+            switch (base.getCommandType()) {
                 case CONNECT:
                     handleConnect(base, session);
                     break;
@@ -57,7 +59,7 @@ public class WebSocketHandler {
                     handleMakeMove(command);
                     break;
                 default:
-                    session.getRemote().sendString("Unknown commandType: " + base.commandType);
+                    session.getRemote().sendString("Unknown commandType: " + base.getCommandType());
             }
 
         } catch (Exception e) {
@@ -71,13 +73,13 @@ public class WebSocketHandler {
     }
 
     private void handleLeave(UserGameCommand command) {
-        AuthData auth = userService.getAuth(command.authToken);
+        AuthData auth = userService.getAuth(command.getAuthToken());
         connections.remove(auth.username());
         //notify all other workers that root user has left
     }
 
     private void handleConnect(UserGameCommand command, Session session) {
-        AuthData auth = userService.getAuth(command.authToken);
+        AuthData auth = userService.getAuth(command.getAuthToken());
         connections.add(auth.username(), session);
         try {
             session.getRemote().sendString("connected");
