@@ -4,6 +4,8 @@ import chess.ChessGame;
 import chess.ChessPiece;
 import chess.ChessPosition;
 
+import java.util.Scanner;
+
 import static ui.EscapeSequences.*;
 
 public class GameUI {
@@ -11,9 +13,14 @@ public class GameUI {
     ChessGame.TeamColor clientColor;
     private String[] columnLabels = {"   ", " h ", " g ", " f ", " e ", " d ", " c ", " b ", " a ", "   "};
     private String[] rowLabels =    {"", " 1 ", " 2 ", " 3 ", " 4 ", " 5 ", " 6 ", " 7 ", " 8 ", ""};
+
+    private boolean running;
+    private Scanner scanner = new Scanner(System.in);
+    private String response = "";
     public GameUI(ChessGame game, ChessGame.TeamColor color){
         this.game = game;
         this.clientColor = color;
+        this.running = true;
     }
 
 
@@ -23,6 +30,25 @@ public class GameUI {
         }else {
             drawGameBoardBlack();
         }
+        while(running){
+
+            System.out.print(" >>>");
+            response = scanner.nextLine().trim();
+
+            if(!response.isEmpty()){
+                try {
+                    handeInput();
+                }catch (Throwable e){
+                    System.out.println(SET_TEXT_COLOR_RED + e.getMessage());
+                }
+            }
+        }
+        //runs command line interface
+    }
+    private void handeInput() {
+        //parse the response value.
+        var args = response.toLowerCase().split("\\s+");
+        var command = args[0];
     }
 
     private void drawGameBoardWhite() {
