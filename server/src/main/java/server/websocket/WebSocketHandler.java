@@ -1,9 +1,11 @@
 package server.websocket;
 
+import chess.ChessGame;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import dataaccess.*;
 import model.AuthData;
+import model.GameData;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketConnect;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
@@ -12,6 +14,9 @@ import server.GameService;
 import server.UserService;
 import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
+import websocket.messages.LoadGameMessage;
+import websocket.messages.NotificationMessage;
+import websocket.messages.ServerMessage;
 
 import java.io.IOException;
 
@@ -74,15 +79,62 @@ public class WebSocketHandler {
 
     private void handleLeave(UserGameCommand command) {
         AuthData auth = userService.getAuth(command.getAuthToken());
-        connections.remove(auth.username());
+        GameData game = gameService.getGameByID(command.getGameID());
+        String msg = auth.username() + " has left the game";
+        if(game.whiteUsername()!=null) {
+            if (game.whiteUsername().equalsIgnoreCase(auth.username())) {
+                msg = msg + " as white";
+                gameService.removePlayerFromGame(command.getGameID(), ChessGame.TeamColor.WHITE);
+            }
+        }
+        else if(game.blackUsername() != null){
+            if(game.blackUsername().equalsIgnoreCase(auth.username())){
+                msg = msg + " as black";
+                gameService.removePlayerFromGame(command.getGameID(), ChessGame.TeamColor.BLACK);
+            }
+
+        } else{
+            msg = msg + " as observer";
+        }
+        //if applicable, update game to no longer have the user present
+        connections.remove(command.getAuthToken(), command.getGameID());
+        NotificationMessage notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, msg);
+        String jsonNotification = gson.toJson(notification, NotificationMessage.class);
+        try {
+            connections.notifyGame(command.getGameID(), jsonNotification, auth.authToken());
+        }
+        catch (Exception e){
+            System.out.println("handle leave failed");
+        }
         //notify all other workers that root user has left
     }
 
     private void handleConnect(UserGameCommand command, Session session) {
         AuthData auth = userService.getAuth(command.getAuthToken());
-        connections.add(auth.username(), session);
+        GameData game = gameService.getGameByID(command.getGameID());
+        String msg = auth.username() + " has joined the game";
+        if(game.whiteUsername()!=null) {
+            if (game.whiteUsername().equalsIgnoreCase(auth.username())) {
+                msg = msg + " as white";
+            }
+        }
+        else if(game.blackUsername() != null){
+            if(game.blackUsername().equalsIgnoreCase(auth.username())){
+                msg = msg + " as black";
+            }
+
+        } else{
+            msg = msg + " as observer";
+        }
+        connections.add(auth,command.getGameID(), session);
+        NotificationMessage notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, msg);
+        String jsonNotification = gson.toJson(notification, NotificationMessage.class);
+        LoadGameMessage loadGameMessage = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, game);
+        String jsonLoadGameMessage = gson.toJson(loadGameMessage, LoadGameMessage.class);
+
         try {
-            session.getRemote().sendString("connected");
+        connections.notifyGame(command.getGameID(),jsonNotification, command.getAuthToken());
+        session.getRemote().sendString(jsonLoadGameMessage);
         } catch (Exception e){
             System.out.println("didn't work");
         }
