@@ -55,4 +55,9 @@ public class GameService {
     public void removePlayerFromGame(int gameID, ChessGame.TeamColor color){
         gameDAO.updateGame(gameID,color, null);
     }
+
+    public void updateGame(int gameID, String gameJson){
+
+        gameDAO.updateGameData(gameID,gameJson);
+    }
 }

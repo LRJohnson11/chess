@@ -114,6 +114,20 @@ public class MySqlGameDAO implements GameDAO{
         return false;
     }
 
+    public void updateGameData(int gameID, String gameJson){
+        var statement = "UPDATE game SET chess_game = ? WHERE id = ?";
+        try(var conn = DatabaseManager.getConnection()){
+            try(var ps = conn.prepareStatement(statement)){
+                ps.setString(1,gameJson);
+                ps.setInt(2,gameID);
+                ps.executeUpdate();
+            }
+
+        } catch (Exception e) {
+            throw new ApiException(500, "Error: failed to list games");
+        }
+    }
+
     private GameData readGame(ResultSet rs) throws SQLException {
         var id = rs.getInt("id");
         String whiteUsername = rs.getString("white_username");

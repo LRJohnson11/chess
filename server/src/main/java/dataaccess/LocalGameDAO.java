@@ -48,4 +48,8 @@ public class LocalGameDAO implements GameDAO{
         games.clear();
         return true;
     }
+
+    @Override
+    public void updateGameData(int gameID, String gameJson) {
+    }
 }
