@@ -74,6 +74,21 @@ public class WebSocketHandler {
     }
 
     private void handleResign(UserGameCommand command) {
+        AuthData auth = userService.getAuth(command.getAuthToken());
+        GameData gamedata = gameService.getGameByID(command.getGameID());
+        ChessGame game = gamedata.game();
+        game.setTeamTurn(null);
+        String jsonGame = gson.toJson(game, ChessGame.class);
+        gameService.updateGame(command.getGameID(), jsonGame);
+        String msg = auth.username() + " has resigned.";
+        NotificationMessage notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, msg);
+        String jsonNotification = gson.toJson(notification, NotificationMessage.class);
+
+        try {
+            connections.notifyGame(command.getGameID(), jsonNotification, null);
+        } catch (IOException e) {
+            System.out.println("handleResign failed");
+        }
         //end the current game if user is one of the players, the other team wins
     }
 
