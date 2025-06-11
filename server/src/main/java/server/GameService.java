@@ -47,4 +47,12 @@ public class GameService {
     public void clearGames(){
         gameDAO.clear();
     }
+
+    public GameData getGameByID(int gameID){
+        return gameDAO.getGame(gameID);
+    }
+
+    public void removePlayerFromGame(int gameID, ChessGame.TeamColor color){
+        gameDAO.updateGame(gameID,color, null);
+    }
 }
