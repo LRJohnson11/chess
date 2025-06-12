@@ -1,9 +1,12 @@
 package ui;
 
 import chess.ChessGame;
+import chess.ChessMove;
 import chess.ChessPiece;
 import chess.ChessPosition;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Scanner;
 
 import static ui.EscapeSequences.*;
@@ -28,7 +31,7 @@ public class GameUI {
         drawBoard(new ArrayList<>());
         while(running){
 
-            System.out.print(" >>>");
+            System.out.print(SET_TEXT_COLOR_WHITE + " >>>");
             response = scanner.nextLine().trim();
 
             if(!response.isEmpty()){
@@ -157,6 +160,8 @@ public class GameUI {
         }
     }
 
+
+
     private void drawGameBoardBlack(Collection<ChessPosition> validPositions) {
         for(int i = 0; i < 10; i++) {
             for(int j = 0; j < 10; j++) {
@@ -220,7 +225,7 @@ public class GameUI {
         if(pieceColor == ChessGame.TeamColor.BLACK){
             System.out.print(SET_TEXT_COLOR_BLUE);
         } else {
-            System.out.print(SET_TEXT_COLOR_YELLOW);
+            System.out.print(SET_TEXT_COLOR_WHITE);
         }
         ChessPiece.PieceType type = piece.getPieceType();
 
@@ -232,5 +237,20 @@ public class GameUI {
             case ROOK -> System.out.print(" R ");
             case PAWN -> System.out.print(" P ");
         }
+    }
+
+    private void help(){
+        System.out.print(SET_TEXT_COLOR_BLUE + "help ");
+        System.out.println(SET_TEXT_COLOR_LIGHT_GREY + "- display available commands.");
+        System.out.print(SET_TEXT_COLOR_BLUE + "redraw ");
+        System.out.println(SET_TEXT_COLOR_LIGHT_GREY + " - redraw the game board.");
+        System.out.print(SET_TEXT_COLOR_BLUE + "leave ");
+        System.out.println(SET_TEXT_COLOR_LIGHT_GREY + "- leave the game and return to the previous UI");
+        System.out.print(SET_TEXT_COLOR_BLUE + "move <from> <to> ");
+        System.out.println(SET_TEXT_COLOR_LIGHT_GREY + "- make a move (e.g. move a2 a4).");
+        System.out.print(SET_TEXT_COLOR_BLUE + "resign ");
+        System.out.println(SET_TEXT_COLOR_LIGHT_GREY + "- resign from the current game.");
+        System.out.print(SET_TEXT_COLOR_BLUE + "highlight <position ");
+        System.out.println(SET_TEXT_COLOR_LIGHT_GREY + "- Highlight all legal moves for the piece at the given position");
     }
 }
