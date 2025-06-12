@@ -33,7 +33,7 @@ public class GameUI {
 
             if(!response.isEmpty()){
                 try {
-                    handeInput();
+                    handleInput();
                 }catch (Throwable e){
                     System.out.println(SET_TEXT_COLOR_RED + e.getMessage());
                 }
@@ -41,10 +41,56 @@ public class GameUI {
         }
         //runs command line interface
     }
-    private void handeInput() {
-        //parse the response value.
+    private void handleInput() {
+        // Parse the response value.
         var args = response.toLowerCase().split("\\s+");
         var command = args[0];
+
+        switch (command) {
+            case "help": help();
+                break;
+
+            case "redraw":
+                redrawBoard();
+                break;
+
+            case "leave":
+                leaveGame();
+                break;
+
+            case "move":
+                if (args.length != 3) {
+                    System.out.println("Usage: move <from> <to> (e.g., move e2 e4)");
+                } else {
+                    String from = args[1];
+                    String to = args[2];
+                    makeMove(from, to);
+                }
+                break;
+
+            case "resign":
+                System.out.println("Are you sure you want to resign? (yes/no)");
+                var confirmation = scanner.nextLine().toLowerCase();
+                if (confirmation.equals("yes")) {
+                    resignGame();
+                } else {
+                    System.out.println("Resignation cancelled.");
+                }
+                break;
+
+            case "highlight":
+                if (args.length < 2) {
+                    System.out.println("Usage: highlight <position> (e.g., highlight e2)");
+                } else {
+                    String position = args[1];
+                    highlightLegalMoves(position);
+                }
+                break;
+
+            default:
+                System.out.println("Unknown command. Type 'help' for a list of available commands.");
+                break;
+        }
     }
 
     private void highlightLegalMoves(String position) {
