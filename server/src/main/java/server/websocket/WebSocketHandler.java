@@ -156,7 +156,7 @@ public class WebSocketHandler {
         connections.notifyGame(command.getGameID(),jsonNotification, command.getAuthToken());
         session.getRemote().sendString(jsonLoadGameMessage);
         } catch (Exception e){
-            System.out.println("didn't work");
+            System.out.println("Server: failed to connect");
         }
         //broadcast rest of game that user has joined the game
         //send load game to root client
