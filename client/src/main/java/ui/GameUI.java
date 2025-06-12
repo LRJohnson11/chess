@@ -25,11 +25,7 @@ public class GameUI {
 
 
     public void run(){
-        if(clientColor == ChessGame.TeamColor.WHITE) {
-            drawGameBoardWhite();
-        }else {
-            drawGameBoardBlack();
-        }
+        drawBoard(new ArrayList<>());
         while(running){
 
             System.out.print(" >>>");
@@ -51,51 +47,92 @@ public class GameUI {
         var command = args[0];
     }
 
-    private void drawGameBoardWhite() {
-        for(int i = 9; i >= 0; i--){
-            for(int j = 9; j >= 0; j--){
-                //border code
-                if( i == 0 || i == 9 || j == 0 || j == 9){
+    private void highlightLegalMoves(String position) {
+        System.out.println(game.getBoard().getPiece(parseStringChessPosition(position)).getPieceType() + ", " + game.getBoard().getPiece(parseStringChessPosition(position)).getTeamColor());
+        var moves = game.validMoves(parseStringChessPosition(position));
+        ArrayList<ChessPosition> positions = new ArrayList<>();
+        if(moves != null) {
+            for (ChessMove move : moves) {
+                System.out.println("move from: " + move.getStartPosition().getRow() +move.getStartPosition().getColumn());
+                System.out.println("move to: " + move.getEndPosition().getRow() + move.getEndPosition().getColumn());
+                positions.add(move.getEndPosition());
+            }
+        }
+        drawBoard(positions);
+    }
+
+    private void makeMove(String from, String to){
+
+    }
+
+    private void resignGame() {
+    }
+
+
+    private void leaveGame() {
+        running = false;
+    }
+
+    private void redrawBoard() {
+        drawBoard(new ArrayList<>());
+    }
+
+    private void drawBoard(Collection<ChessPosition> validPositions) {
+        if(clientColor == ChessGame.TeamColor.WHITE) {
+            drawGameBoardWhite(validPositions);
+        } else {
+            drawGameBoardBlack(validPositions);
+        }
+    }
+
+    private void drawGameBoardWhite(Collection<ChessPosition> validPositions) {
+        for(int i = 9; i >= 0; i--) {
+            for(int j = 9; j >= 0; j--) {
+                if(i == 0 || i == 9 || j == 0 || j == 9) {
                     System.out.print(SET_BG_COLOR_DARK_GREY);
                     System.out.print(SET_TEXT_COLOR_WHITE);
-                    if(i ==0 || i == 9){
+                    if(i == 0 || i == 9) {
                         System.out.print(columnLabels[j]);
                     }
-                    if(j == 0 || j == 9){
-                        System.out.print(rowLabels[i] + (j == 0 ? "\n": ""));
+                    if(j == 0 || j == 9) {
+                        System.out.print(rowLabels[i] + (j == 0 ? "\n" : ""));
                     }
-                } else if( i % 2  == j % 2) {
-                    System.out.print(SET_BG_COLOR_LIGHT_GREY);
-                    printBoardPiece(i,j);
-                } else{
-                    System.out.print(SET_BG_COLOR_BLACK);
-                    printBoardPiece(i,j);
+                } else {
+                    if(validPositions.contains(new ChessPosition(i,9-j))) {
+                        System.out.print(SET_BG_COLOR_YELLOW);
+                    } else if(i % 2 == j % 2) {
+                        System.out.print(SET_BG_COLOR_LIGHT_GREY);
+                    } else {
+                        System.out.print(SET_BG_COLOR_BLACK);
+                    }
+                    printBoardPiece(i, j);
                 }
             }
         }
     }
 
-
-    private void drawGameBoardBlack() {
-        for(int i = 0; i < 10; i++){
-            for(int j = 0; j < 10; j++){
-                //border code
-                if( i == 0 || i == 9 || j == 0 || j == 9){
+    private void drawGameBoardBlack(Collection<ChessPosition> validPositions) {
+        for(int i = 0; i < 10; i++) {
+            for(int j = 0; j < 10; j++) {
+                if(i == 0 || i == 9 || j == 0 || j == 9) {
                     System.out.print(SET_BG_COLOR_DARK_GREY);
                     System.out.print(SET_TEXT_COLOR_WHITE);
-                    if(i ==0 || i == 9){
+                    if(i == 0 || i == 9) {
                         System.out.print(columnLabels[j]);
                     }
-                    if(j == 0 || j == 9){
-                        System.out.print(rowLabels[i] + (j == 9 ? "\n": ""));
+                    if(j == 0 || j == 9) {
+                        System.out.print(rowLabels[i] + (j == 9 ? "\n" : ""));
                     }
-                } else if( i % 2  == j % 2) {
-                    System.out.print(SET_BG_COLOR_LIGHT_GREY);
-                    printBoardPiece(i,j);
-                } else{
+                } else {
+                    if(validPositions.contains(new ChessPosition(i,9 - j))) {
+                        System.out.print(SET_BG_COLOR_YELLOW);
+                    } else if(i % 2 == j % 2) {
+                        System.out.print(SET_BG_COLOR_LIGHT_GREY);
+                    } else {
                         System.out.print(SET_BG_COLOR_BLACK);
-                        printBoardPiece(i,j);
                     }
+                    printBoardPiece(i, j);
+                }
             }
         }
     }
