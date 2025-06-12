@@ -137,6 +137,33 @@ public class GameUI {
         }
     }
 
+    private ChessPosition parseStringChessPosition(String position){
+        if(position.length() != 2){
+            throw new RuntimeException("Chess position string invalid. Expects two characters (e.g., 'e5').");
+        }
+
+        char columnChar = Character.toLowerCase(position.charAt(0)); // 'a' to 'h'
+        char rowChar = position.charAt(1); // '1' to '8'
+
+        if(columnChar < 'a' || columnChar > 'h'){
+            throw new RuntimeException("Invalid columncharacter. Must be a-h.");
+        }
+
+        if(rowChar < '1' || rowChar > '8'){
+            throw new RuntimeException("Invalid row character. Must be 1-8.");
+        }
+
+        int column = columnChar - 'a' + 1;
+        int row = Character.getNumericValue(rowChar);
+
+        return new ChessPosition(row, column);
+    }
+
+
+
+
+
+
     private void printBoardPiece(int i, int j) {
         if(game.getBoard().getPiece(new ChessPosition(i, 9 -j)) == null){
             System.out.print("   ");
