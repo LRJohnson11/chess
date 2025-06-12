@@ -4,6 +4,9 @@ import chess.ChessGame;
 import chess.ChessMove;
 import chess.ChessPiece;
 import chess.ChessPosition;
+import model.GameData;
+import websocket.NotificationHandler;
+import websocket.WebsocketFacade;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -12,18 +15,26 @@ import java.util.Scanner;
 import static ui.EscapeSequences.*;
 
 public class GameUI {
-    ChessGame game;
+    GameData gameData;
     ChessGame.TeamColor clientColor;
     private String[] columnLabels = {"   ", " h ", " g ", " f ", " e ", " d ", " c ", " b ", " a ", "   "};
     private String[] rowLabels =    {"", " 1 ", " 2 ", " 3 ", " 4 ", " 5 ", " 6 ", " 7 ", " 8 ", ""};
-
+    private NotificationHandler notificationHandler;
+    private WebsocketFacade ws;
+    private String authToken;
     private boolean running;
     private Scanner scanner = new Scanner(System.in);
     private String response = "";
-    public GameUI(ChessGame game, ChessGame.TeamColor color){
-        this.game = game;
+
+
+    public GameUI(GameData game, ChessGame.TeamColor color,String authToken) throws Exception {
+        this.ws = new WebsocketFacade("http://localhost:2001", notificationHandler);
+        this.gameData = game;
         this.clientColor = color;
         this.running = true;
+        this.authToken = authToken;
+
+        ws.connect(authToken,game.gameID());
     }
 
 
@@ -77,7 +88,7 @@ public class GameUI {
                 if (confirmation.equals("yes")) {
                     resignGame();
                 } else {
-                    System.out.println("Resignation cancelled.");
+                    System.out.println("Resignation failed.");
                 }
                 break;
 
@@ -97,8 +108,8 @@ public class GameUI {
     }
 
     private void highlightLegalMoves(String position) {
-        System.out.println(game.getBoard().getPiece(parseStringChessPosition(position)).getPieceType() + ", " + game.getBoard().getPiece(parseStringChessPosition(position)).getTeamColor());
-        var moves = game.validMoves(parseStringChessPosition(position));
+        System.out.println(gameData.game().getBoard().getPiece(parseStringChessPosition(position)).getPieceType() + ", " + gameData.game().getBoard().getPiece(parseStringChessPosition(position)).getTeamColor());
+        var moves = gameData.game().validMoves(parseStringChessPosition(position));
         ArrayList<ChessPosition> positions = new ArrayList<>();
         if(moves != null) {
             for (ChessMove move : moves) {
@@ -115,6 +126,7 @@ public class GameUI {
     }
 
     private void resignGame() {
+        ws.resign(authToken, gameData.gameID());
     }
 
 
@@ -216,11 +228,11 @@ public class GameUI {
 
 
     private void printBoardPiece(int i, int j) {
-        if(game.getBoard().getPiece(new ChessPosition(i, 9 -j)) == null){
+        if(gameData.game().getBoard().getPiece(new ChessPosition(i, 9 -j)) == null){
             System.out.print("   ");
             return;
         }
-        ChessPiece piece = game.getBoard().getPiece(new ChessPosition(i,9 - j));
+        ChessPiece piece = gameData.game().getBoard().getPiece(new ChessPosition(i,9 - j));
         ChessGame.TeamColor pieceColor = piece.getTeamColor();
         if(pieceColor == ChessGame.TeamColor.BLACK){
             System.out.print(SET_TEXT_COLOR_BLUE);

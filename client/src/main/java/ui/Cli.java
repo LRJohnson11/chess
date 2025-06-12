@@ -150,7 +150,7 @@ public class Cli {
         }
         try{
             server.joinGame(authToken, gameID,color);
-            new GameUI(games.get(Integer.parseInt(args[1])).game(), color).run();
+            new GameUI(games.get(Integer.parseInt(args[1])), color, authToken).run();
         } catch (Exception e){
             throw new RuntimeException(e.getMessage());
         }
@@ -162,7 +162,7 @@ public class Cli {
             //add validation that gameId exists
             var gameId = Integer.parseInt(args[1]);
             if(games.containsKey(gameId)) {
-                new GameUI(games.get(Integer.parseInt(args[1])).game(), ChessGame.TeamColor.WHITE).run();
+                new GameUI(games.get(Integer.parseInt(args[1])), ChessGame.TeamColor.WHITE, authToken).run();
             }
             else{
                 throw new RuntimeException("game not found. run 'list' to find available games.");
