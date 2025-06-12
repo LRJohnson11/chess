@@ -1,6 +1,7 @@
 package server.websocket;
 
 import chess.ChessGame;
+import chess.InvalidMoveException;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import dataaccess.*;
@@ -14,11 +15,13 @@ import server.GameService;
 import server.UserService;
 import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
+import websocket.messages.ErrorMessage;
 import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
 import java.io.IOException;
+import java.util.Objects;
 
 @WebSocket
 public class WebSocketHandler {
@@ -29,6 +32,8 @@ public class WebSocketHandler {
     private AuthDAO authDAO = new MySqlAuthDAO();
     private UserService userService = new UserService(authDAO,userDao);
     private GameService gameService = new GameService(gameDao);
+
+    private String[] columns = {"a","b","c","d","e","f","g","h"};
 
     @OnWebSocketConnect
     public void onConnect(Session session) {
@@ -61,7 +66,7 @@ public class WebSocketHandler {
                     break;
                 case MAKE_MOVE:
                     MakeMoveCommand command = gson.fromJson(message, MakeMoveCommand.class);
-                    handleMakeMove(command);
+                    handleMakeMove(command, session);
                     break;
                 default:
                     session.getRemote().sendString("Unknown commandType: " + base.getCommandType());
@@ -75,8 +80,8 @@ public class WebSocketHandler {
 
     private void handleResign(UserGameCommand command) {
         AuthData auth = userService.getAuth(command.getAuthToken());
-        GameData gamedata = gameService.getGameByID(command.getGameID());
-        ChessGame game = gamedata.game();
+        GameData gameData = gameService.getGameByID(command.getGameID());
+        ChessGame game = gameData.game();
         game.setTeamTurn(null);
         String jsonGame = gson.toJson(game, ChessGame.class);
         gameService.updateGame(command.getGameID(), jsonGame);
@@ -156,7 +161,57 @@ public class WebSocketHandler {
         //broadcast rest of game that user has joined the game
         //send load game to root client
     }
-    private void handleMakeMove(MakeMoveCommand command) {
+    private void handleMakeMove(MakeMoveCommand command,Session session) throws IOException {
+        AuthData auth = userService.getAuth(command.getAuthToken());
+        GameData gameData = gameService.getGameByID(command.getGameID());
+        ChessGame game = gameData.game();
+
+        try{
+            game.makeMove(command.getMove());
+        } catch (InvalidMoveException e) {
+            String errorMessage = e.getMessage();
+            ErrorMessage error = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, errorMessage);
+            String errorJson = gson.toJson(error, ErrorMessage.class);
+            session.getRemote().sendString(errorJson);
+            return;
+        }
+        //update the server
+        String gameJson = gson.toJson(game, ChessGame.class);
+        LoadGameMessage loadGameMessage = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, gameData);
+        String loadingJson = gson.toJson(loadGameMessage, LoadGameMessage.class);
+        String movemsg = auth.username() + " moved " + game.getBoard().getPiece(command.getMove().getEndPosition()).getPieceType().name() + " to " + columns[command.getMove().getEndPosition().getColumn()] + command.getMove().getEndPosition().getRow();
+        NotificationMessage notificationMessage = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, movemsg);
+        String moveJson = gson.toJson(notificationMessage, NotificationMessage.class);
+        //check for check,checkmate, and stalemate on enemy player
+        ChessGame.TeamColor enemyTeam = Objects.equals(gameData.whiteUsername(), auth.username()) ? ChessGame.TeamColor.BLACK : ChessGame.TeamColor.WHITE;
+        String gameStateMsg = "";
+        if(game.isInCheck(enemyTeam)){
+            gameStateMsg = enemyTeam.name() + " is in check";
+            if(game.isInCheckmate(enemyTeam)){
+                game.setTeamTurn(null);
+                gameStateMsg = enemyTeam.name() + " is in checkmate! game over.";
+            }
+        }
+        else if(game.isInStalemate(enemyTeam)){
+            gameStateMsg = enemyTeam.name() + " is in Stalemate";
+            game.setTeamTurn(null);
+        }
+        NotificationMessage gameStateNotification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, gameStateMsg);
+        String gameStateJson = gson.toJson(gameStateNotification, NotificationMessage.class);
+
+        gameService.updateGame(command.getGameID(), gameJson);
+
+        try{
+            connections.notifyGame(command.getGameID(), loadingJson, null);
+            connections.notifyGame(command.getGameID(),moveJson, null);
+            if(!gameStateMsg.isEmpty()){
+                connections.notifyGame(command.getGameID(), gameStateJson, null);
+            }
+
+        }catch (Exception e){
+            throw new RuntimeException(e.getMessage());
+        }
+
         //handle makemove
         //update game in db
         //sends load_GAME to all parties
