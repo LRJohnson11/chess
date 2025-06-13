@@ -1,14 +1,16 @@
 package websocket;
 
+import chess.ChessMove;
 import com.google.gson.Gson;
+import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
+import websocket.messages.ErrorMessage;
 import websocket.messages.LoadGameMessage;
+import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
 import javax.websocket.*;
-import java.io.IOException;
 import java.net.URI;
-import java.net.URISyntaxException;
 
 public class WebsocketFacade extends Endpoint {
     Session session;
@@ -28,12 +30,18 @@ public class WebsocketFacade extends Endpoint {
                 @Override
                 public void onMessage(String message) {
                     ServerMessage notification = new Gson().fromJson(message, ServerMessage.class);
-                    if(notification.getServerMessageType() == ServerMessage.ServerMessageType.LOAD_GAME){
-                        LoadGameMessage loadGameMessage = new Gson().fromJson(message, LoadGameMessage.class);
-                        notificationHandler.notify(loadGameMessage);
-                        return;
+                    switch(notification.getServerMessageType()){
+                        case LOAD_GAME:
+                            LoadGameMessage loadGameMessage = new Gson().fromJson(message, LoadGameMessage.class);
+                            notificationHandler.loadGame(loadGameMessage);
+                            break;
+                        case NOTIFICATION:
+                            notificationHandler.notify(new Gson().fromJson(message, NotificationMessage.class));
+                            break;
+                        case ERROR:
+                            notificationHandler.showError(new Gson().fromJson(message, ErrorMessage.class));
+                            break;
                     }
-                    notificationHandler.notify(notification);
                 }
             });
         } catch (Exception e) {
@@ -63,6 +71,23 @@ public class WebsocketFacade extends Endpoint {
             this.session.getBasicRemote().sendText(new Gson().toJson(command, UserGameCommand.class));
         } catch (Exception e) {
             throw new RuntimeException("failed to connect");
+        }
+    }
+
+    public void leave(String authToken, int gameID) {
+        try{
+            UserGameCommand command = new UserGameCommand(UserGameCommand.CommandType.LEAVE, authToken, gameID);
+            this.session.getBasicRemote().sendText(new Gson().toJson(command,UserGameCommand.class));
+        } catch (Exception e){
+            throw new RuntimeException("failed to leave the game");
+        }
+    }
+    public void makeMove(String authtoken, int gameID, ChessMove move){
+        try{
+            MakeMoveCommand moveCommand = new MakeMoveCommand(UserGameCommand.CommandType.MAKE_MOVE, authtoken,gameID, move);
+            this.session.getBasicRemote().sendText(new Gson().toJson(moveCommand, MakeMoveCommand.class));
+        } catch (Exception e) {
+            throw new RuntimeException("failed to make move");
         }
     }
 }

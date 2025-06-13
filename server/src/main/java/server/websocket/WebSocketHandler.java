@@ -73,8 +73,8 @@ public class WebSocketHandler {
             }
 
         } catch (Exception e) {
-            session.getRemote().sendString("Malformed JSON or invalid command");
-            e.printStackTrace();
+            ErrorMessage error = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, e.getMessage());
+            session.getRemote().sendString(gson.toJson(error, ErrorMessage.class));
         }
     }
 
@@ -179,7 +179,7 @@ public class WebSocketHandler {
         String gameJson = gson.toJson(game, ChessGame.class);
         LoadGameMessage loadGameMessage = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, gameData);
         String loadingJson = gson.toJson(loadGameMessage, LoadGameMessage.class);
-        String movemsg = auth.username() + " moved " + game.getBoard().getPiece(command.getMove().getEndPosition()).getPieceType().name() + " to " + columns[command.getMove().getEndPosition().getColumn()] + command.getMove().getEndPosition().getRow();
+        String movemsg = auth.username() + " moved " + game.getBoard().getPiece(command.getMove().getEndPosition()).getPieceType().name() + " to " + columns[command.getMove().getEndPosition().getColumn() - 1] + command.getMove().getEndPosition().getRow();
         NotificationMessage notificationMessage = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, movemsg);
         String moveJson = gson.toJson(notificationMessage, NotificationMessage.class);
         //check for check,checkmate, and stalemate on enemy player
@@ -211,15 +211,6 @@ public class WebSocketHandler {
         }catch (Exception e){
             throw new RuntimeException(e.getMessage());
         }
-
-        //handle makemove
-        //update game in db
-        //sends load_GAME to all parties
-
-
-
-        //self-descriptive
-        System.out.println("make move");
     }
 
 }
