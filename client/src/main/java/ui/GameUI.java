@@ -7,6 +7,9 @@ import chess.ChessPosition;
 import model.GameData;
 import websocket.NotificationHandler;
 import websocket.WebsocketFacade;
+import websocket.messages.ErrorMessage;
+import websocket.messages.LoadGameMessage;
+import websocket.messages.NotificationMessage;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -14,12 +17,11 @@ import java.util.Scanner;
 
 import static ui.EscapeSequences.*;
 
-public class GameUI {
+public class GameUI implements NotificationHandler {
     GameData gameData;
     ChessGame.TeamColor clientColor;
     private String[] columnLabels = {"   ", " h ", " g ", " f ", " e ", " d ", " c ", " b ", " a ", "   "};
     private String[] rowLabels =    {"", " 1 ", " 2 ", " 3 ", " 4 ", " 5 ", " 6 ", " 7 ", " 8 ", ""};
-    private NotificationHandler notificationHandler;
     private WebsocketFacade ws;
     private String authToken;
     private boolean running;
@@ -28,7 +30,7 @@ public class GameUI {
 
 
     public GameUI(GameData game, ChessGame.TeamColor color,String authToken) throws Exception {
-        this.ws = new WebsocketFacade("http://localhost:2001", notificationHandler);
+        this.ws = new WebsocketFacade("http://localhost:2001", this);
         this.gameData = game;
         this.clientColor = color;
         this.running = true;
@@ -122,6 +124,58 @@ public class GameUI {
     }
 
     private void makeMove(String from, String to){
+        ChessPosition start = parseStringChessPosition(from);
+        ChessPosition end = parseStringChessPosition(to);
+
+        ChessPiece piece = gameData.game().getBoard().getPiece(start);
+        if(piece == null){
+            System.out.println("invalid move. move cancelled");
+        }
+        //if pawn can promote, query for a promotion piece.
+        ChessPiece.PieceType promotionPiece = null;
+        if(piece.getPieceType() == ChessPiece.PieceType.PAWN){
+            if (end.getRow() == 1 || end.getRow() == 8) {
+                System.out.println("Piece can promote! Enter one of the following:");
+                System.out.println("Q - Queen");
+                System.out.println("N - Knight");
+                System.out.println("B - Bishop");
+                System.out.println("R - Rook");
+
+                Scanner scanner = new Scanner(System.in);
+                String choice = scanner.nextLine().trim().toUpperCase();
+
+                switch (choice) {
+                    case "Q":
+                        System.out.println("You chose Queen.");
+                        promotionPiece = ChessPiece.PieceType.QUEEN;
+                        break;
+                    case "N":
+                        System.out.println("You chose Knight.");
+                        promotionPiece = ChessPiece.PieceType.KNIGHT;
+                        break;
+                    case "B":
+                        System.out.println("You chose Bishop.");
+                        promotionPiece = ChessPiece.PieceType.BISHOP;
+                        break;
+                    case "R":
+                        System.out.println("You chose Rook.");
+                        promotionPiece = ChessPiece.PieceType.ROOK;
+                        break;
+                    default:
+                        System.out.println("Invalid choice. move cancelled.");
+                        return;
+                }
+            }
+        }
+
+        ChessMove move = new ChessMove(start,end,promotionPiece);
+        if(piece.getTeamColor() != clientColor){
+            throw new RuntimeException("you can't move enemy pieces!");
+        }
+        if(piece.getTeamColor() != gameData.game().getTeamTurn()){
+            throw new RuntimeException("you can't move a piece when it is not your turn!");
+        }
+        ws.makeMove(authToken, gameData.gameID(), move);
 
     }
 
@@ -131,6 +185,7 @@ public class GameUI {
 
 
     private void leaveGame() {
+        ws.leave(authToken, gameData.gameID());
         running = false;
     }
 
@@ -264,5 +319,26 @@ public class GameUI {
         System.out.println(SET_TEXT_COLOR_LIGHT_GREY + "- resign from the current game.");
         System.out.print(SET_TEXT_COLOR_BLUE + "highlight <position ");
         System.out.println(SET_TEXT_COLOR_LIGHT_GREY + "- Highlight all legal moves for the piece at the given position");
+    }
+
+    @Override
+    public void loadGame(LoadGameMessage loadGame) {
+        gameData = loadGame.getGame();
+        System.out.print("\n");
+        redrawBoard();
+    }
+
+    @Override
+    public void notify(NotificationMessage notification) {
+        System.out.println("\n" + notification.getMessage());
+        System.out.print(" >>>");
+
+    }
+
+    @Override
+    public void showError(ErrorMessage error) {
+        System.out.println("\n" + SET_TEXT_COLOR_RED + error.getErrorMessage());
+        System.out.print(SET_TEXT_COLOR_WHITE + " >>>");
+
     }
 }
