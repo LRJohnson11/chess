@@ -44,7 +44,6 @@ public class WebSocketHandler {
 
     @OnWebSocketMessage
     public void handleMessage(Session session, String message) throws IOException {
-        System.out.println("received: " + message);
         try {
             // Peek at commandType to determine exact command class
             UserGameCommand base = gson.fromJson(message, UserGameCommand.class);
