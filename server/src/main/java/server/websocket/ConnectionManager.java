@@ -33,14 +33,18 @@ public class ConnectionManager {
 
     public void notifyGame(int gameID, String jsonMessage, String excludePlayer) throws IOException {
         Set<String> tokens = connectionsByGame.get(gameID);
-        if (tokens == null) return;
+        if (tokens == null) {
+            return;
+        }
 
         for (String token : tokens) {
-            if (token.equals(excludePlayer)) continue;
+            if (token.equals(excludePlayer)) {
+                continue;
+            }
 
             Connection conn = connections.get(token);
             if (conn != null) {
-                conn.sendNotification(jsonMessage); // calls the private notify method internally
+                conn.sendNotification(jsonMessage);
             }
         }
     }
