@@ -130,6 +130,7 @@ public class Server {
         userService.clearUsers();
         userService.clearAuth();
         gameService.clearGames();
+        webSocketHandler.clearWS();
     }
     private AuthData checkValidAuth(String authToken){
         AuthData user = userService.getAuth(authToken);

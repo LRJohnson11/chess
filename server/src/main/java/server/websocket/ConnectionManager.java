@@ -48,7 +48,10 @@ public class ConnectionManager {
             }
         }
     }
-
+    public void clear(){
+        connectionsByGame.clear();
+        connections.clear();
+    }
     //broadcast to player
 
 }

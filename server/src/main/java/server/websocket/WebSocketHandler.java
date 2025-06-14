@@ -239,4 +239,8 @@ public class WebSocketHandler {
         }
     }
 
+    public void clearWS(){
+        connections.clear();
+    }
+
 }

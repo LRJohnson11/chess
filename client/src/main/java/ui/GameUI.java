@@ -96,7 +96,7 @@ public class GameUI implements NotificationHandler {
 
             case "highlight":
                 if (args.length < 2) {
-                    System.out.println("Usage: highlight <position> (e.g., highlight e2)");
+                    System.out.println(SET_TEXT_COLOR_BLUE + "Usage: highlight <position> (e.g., highlight e2)");
                 } else {
                     String position = args[1];
                     highlightLegalMoves(position);
@@ -104,7 +104,7 @@ public class GameUI implements NotificationHandler {
                 break;
 
             default:
-                System.out.println("Unknown command. Type 'help' for a list of available commands.");
+                System.out.println(SET_TEXT_COLOR_WHITE + "Unknown command. Type 'help' for a list of available commands.");
                 break;
         }
     }
@@ -126,13 +126,13 @@ public class GameUI implements NotificationHandler {
 
         ChessPiece piece = gameData.game().getBoard().getPiece(start);
         if(piece == null){
-            System.out.println("invalid move. move cancelled");
+            System.out.println(SET_TEXT_COLOR_RED + "invalid move. move cancelled");
         }
         //if pawn can promote, query for a promotion piece.
         ChessPiece.PieceType promotionPiece = null;
         if(piece.getPieceType() == ChessPiece.PieceType.PAWN){
             if (end.getRow() == 1 || end.getRow() == 8) {
-                System.out.println("Piece can promote! Enter one of the following:");
+                System.out.println(SET_TEXT_COLOR_BLUE + "Piece can promote! Enter one of the following:");
                 System.out.println("Q - Queen");
                 System.out.println("N - Knight");
                 System.out.println("B - Bishop");
