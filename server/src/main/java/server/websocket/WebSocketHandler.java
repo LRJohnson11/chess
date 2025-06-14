@@ -78,10 +78,17 @@ public class WebSocketHandler {
         }
     }
 
-    private void handleResign(UserGameCommand command) {
+    private void handleResign(UserGameCommand command, Session session) throws IOException {
         AuthData auth = userService.getAuth(command.getAuthToken());
         GameData gameData = gameService.getGameByID(command.getGameID());
         ChessGame game = gameData.game();
+        if(auth.username() != gameData.whiteUsername() || auth.username() != gameData.blackUsername()){
+            String errorMessage = "Error: observers cannot resign";
+            ErrorMessage error = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, errorMessage);
+            String errorJson = gson.toJson(error, ErrorMessage.class);
+            session.getRemote().sendString(errorJson);
+            return;
+        }
         game.setTeamTurn(null);
         String jsonGame = gson.toJson(game, ChessGame.class);
         gameService.updateGame(command.getGameID(), jsonGame);
