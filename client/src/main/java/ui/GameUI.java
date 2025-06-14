@@ -214,20 +214,22 @@ public class GameUI implements NotificationHandler {
                         System.out.print(rowLabels[i] + (j == 0 ? "\n" : ""));
                     }
                 } else {
-                    if(validPositions.contains(new ChessPosition(i,9-j))) {
-                        System.out.print(SET_BG_COLOR_YELLOW);
-                    } else if(i % 2 == j % 2) {
-                        System.out.print(SET_BG_COLOR_LIGHT_GREY);
-                    } else {
-                        System.out.print(SET_BG_COLOR_BLACK);
-                    }
+                    drawChessBG(i,j,validPositions);
                     printBoardPiece(i, j);
                 }
             }
         }
     }
 
-
+    private void drawChessBG(int i, int j, Collection<ChessPosition> legalMoves){
+        if(legalMoves.contains(new ChessPosition(i,9-j))) {
+            System.out.print(SET_BG_COLOR_YELLOW);
+        } else if(i % 2 == j % 2) {
+            System.out.print(SET_BG_COLOR_LIGHT_GREY);
+        } else {
+            System.out.print(SET_BG_COLOR_BLACK);
+        }
+    }
 
     private void drawGameBoardBlack(Collection<ChessPosition> validPositions) {
         for(int i = 0; i < 10; i++) {
@@ -242,13 +244,7 @@ public class GameUI implements NotificationHandler {
                         System.out.print(rowLabels[i] + (j == 9 ? "\n" : ""));
                     }
                 } else {
-                    if(validPositions.contains(new ChessPosition(i,9 - j))) {
-                        System.out.print(SET_BG_COLOR_YELLOW);
-                    } else if(i % 2 == j % 2) {
-                        System.out.print(SET_BG_COLOR_LIGHT_GREY);
-                    } else {
-                        System.out.print(SET_BG_COLOR_BLACK);
-                    }
+                    drawChessBG(i,j,validPositions);
                     printBoardPiece(i, j);
                 }
             }
