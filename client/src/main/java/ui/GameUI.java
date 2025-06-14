@@ -110,13 +110,10 @@ public class GameUI implements NotificationHandler {
     }
 
     private void highlightLegalMoves(String position) {
-        System.out.println(gameData.game().getBoard().getPiece(parseStringChessPosition(position)).getPieceType() + ", " + gameData.game().getBoard().getPiece(parseStringChessPosition(position)).getTeamColor());
         var moves = gameData.game().validMoves(parseStringChessPosition(position));
         ArrayList<ChessPosition> positions = new ArrayList<>();
         if(moves != null) {
             for (ChessMove move : moves) {
-                System.out.println("move from: " + move.getStartPosition().getRow() +move.getStartPosition().getColumn());
-                System.out.println("move to: " + move.getEndPosition().getRow() + move.getEndPosition().getColumn());
                 positions.add(move.getEndPosition());
             }
         }
