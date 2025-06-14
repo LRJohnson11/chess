@@ -117,15 +117,16 @@ public class WebSocketHandler {
             msg = msg + " as observer";
         }
         //if applicable, update game to no longer have the user present
-        connections.remove(command.getAuthToken(), command.getGameID());
         NotificationMessage notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, msg);
         String jsonNotification = gson.toJson(notification, NotificationMessage.class);
         try {
-            connections.notifyGame(command.getGameID(), jsonNotification, auth.authToken());
+            connections.notifyGame(command.getGameID(), jsonNotification, null);
         }
         catch (Exception e){
             System.out.println("handle leave failed");
         }
+        connections.remove(command.getAuthToken(), command.getGameID());
+
         //notify all other workers that root user has left
     }
 
