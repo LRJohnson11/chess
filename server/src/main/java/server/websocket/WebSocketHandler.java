@@ -219,7 +219,7 @@ public class WebSocketHandler {
 
         try{
             connections.notifyGame(command.getGameID(), loadingJson, null);
-            connections.notifyGame(command.getGameID(),moveJson, null);
+            connections.notifyGame(command.getGameID(),moveJson, command.getAuthToken());
             if(!gameStateMsg.isEmpty()){
                 connections.notifyGame(command.getGameID(), gameStateJson, null);
             }
