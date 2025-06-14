@@ -62,7 +62,7 @@ public class WebSocketHandler {
                     handleLeave(base);
                     break;
                 case RESIGN:
-                    handleResign(base);
+                    handleResign(base, session);
                     break;
                 case MAKE_MOVE:
                     MakeMoveCommand command = gson.fromJson(message, MakeMoveCommand.class);
@@ -161,8 +161,8 @@ public class WebSocketHandler {
         String jsonLoadGameMessage = gson.toJson(loadGameMessage, LoadGameMessage.class);
 
         try {
-        connections.notifyGame(command.getGameID(),jsonNotification, command.getAuthToken());
-        session.getRemote().sendString(jsonLoadGameMessage);
+            session.getRemote().sendString(jsonLoadGameMessage);
+            connections.notifyGame(command.getGameID(),jsonNotification, command.getAuthToken());
         } catch (Exception e){
             System.out.println("Server: failed to connect");
         }
@@ -173,6 +173,14 @@ public class WebSocketHandler {
         AuthData auth = userService.getAuth(command.getAuthToken());
         GameData gameData = gameService.getGameByID(command.getGameID());
         ChessGame game = gameData.game();
+        String currentTeamUsername = game.getTeamTurn() == ChessGame.TeamColor.WHITE ? gameData.whiteUsername() : gameData.blackUsername();
+        if(!currentTeamUsername.equalsIgnoreCase(auth.username())){
+            String errorMessage = "Error: you cannot make a move when it is not your turn";
+            ErrorMessage error = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, errorMessage);
+            String errorJson = gson.toJson(error, ErrorMessage.class);
+            session.getRemote().sendString(errorJson);
+            return;
+        }
 
         try{
             game.makeMove(command.getMove());
