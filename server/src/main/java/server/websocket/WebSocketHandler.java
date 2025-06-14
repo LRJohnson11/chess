@@ -81,8 +81,15 @@ public class WebSocketHandler {
         AuthData auth = userService.getAuth(command.getAuthToken());
         GameData gameData = gameService.getGameByID(command.getGameID());
         ChessGame game = gameData.game();
-        if(auth.username() != gameData.whiteUsername() || auth.username() != gameData.blackUsername()){
+        if(!Objects.equals(auth.username(), gameData.whiteUsername()) && !Objects.equals(auth.username(), gameData.blackUsername())){
             String errorMessage = "Error: observers cannot resign";
+            ErrorMessage error = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, errorMessage);
+            String errorJson = gson.toJson(error, ErrorMessage.class);
+            session.getRemote().sendString(errorJson);
+            return;
+        }
+        if(game.getTeamTurn() == null){
+            String errorMessage = "Error: Cannot resign. Game is already over.";
             ErrorMessage error = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, errorMessage);
             String errorJson = gson.toJson(error, ErrorMessage.class);
             session.getRemote().sendString(errorJson);
@@ -126,7 +133,7 @@ public class WebSocketHandler {
         NotificationMessage notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, msg);
         String jsonNotification = gson.toJson(notification, NotificationMessage.class);
         try {
-            connections.notifyGame(command.getGameID(), jsonNotification, null);
+            connections.notifyGame(command.getGameID(), jsonNotification, command.getAuthToken());
         }
         catch (Exception e){
             System.out.println("handle leave failed");
